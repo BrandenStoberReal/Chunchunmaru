@@ -39,7 +39,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{markovSentence "default" 10}} Dashboard</title>
+    <title>{{markovSentence "model.json" 10}} Dashboard</title>
     <meta charset="UTF-8">
     {{ randomCSSVars $cssVars }}
     {{- range $i := repeat $styleBlockCount }}
@@ -60,7 +60,7 @@
 <body class="{{randomClasses (add 6 (div $aggression 8))}}" {{randomInlineStyle (add 10 (div $aggression 7))}}>
 {{nestDivs $mainDivs}}
 <header>
-    <h1>{{markovSentence "default" 14}}</h1>
+    <h1>{{markovSentence "model.json" 14}}</h1>
     <nav>
         {{range $i := repeat $navLinks}}
         <a href="{{randomQueryLink 3}}" class="{{randomClasses 3}}" style="{{randomCSSStyle 3}}">{{randomWord}}</a>
@@ -75,7 +75,7 @@
             {{if lt $aggression 60}}
             {{range $i := repeat 4}}
             <div class="widget {{randomClasses 2}}" style="{{randomCSSStyle 6}}">
-                <h3>{{markovSentence "default" 4}}</h3>
+                <h3>{{markovSentence "model.json" 4}}</h3>
                 <p>{{randomInt 100 10000}} {{randomWord}}</p>
                 <span>{{randomDate "2006-01-02" "2015-01-01" "2024-12-31"}}</span>
                 <pre>{{randomJSON 2 2 8}}</pre>

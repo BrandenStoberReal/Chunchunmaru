@@ -37,7 +37,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>{{markovSentence "default" 8}} - {{randomWord}}</title>
+  <title>{{markovSentence "model.json" 8}} - {{randomWord}}</title>
   <meta charset="UTF-8">
   {{ randomCSSVars $cssVars }}
   {{- range $i := repeat $styleBlockCount }}
@@ -58,7 +58,7 @@
 <body class="{{randomClasses (add 5 (div $aggression 8))}}" {{randomInlineStyle (add 8 (div $aggression 7))}}>
 {{nestDivs $mainDivs}}
 <header>
-  <h1>{{markovSentence "default" (add 12 (div $aggression 7))}}</h1>
+  <h1>{{markovSentence "model.json" (add 12 (div $aggression 7))}}</h1>
   <nav>
     {{range $i := repeat $navLinks}}
     <a href="{{randomQueryLink 4}}" class="{{randomClasses 3}}" style="{{randomCSSStyle 4}}">{{randomWord}}</a>
@@ -73,7 +73,7 @@
   {{if lt $aggression 60}}
   {{range $i := repeat $profileCount}}
   <article class="profile {{randomClasses 3}}" {{randomInlineStyle 6}}>
-    <h2>{{markovSentence "default" 10}}</h2>
+    <h2>{{markovSentence "model.json" 10}}</h2>
     <p>
       <em>{{randomDate "2006-01-02" "2018-01-01" "2024-12-31"}} &mdash; {{randomString "username" 8}} &mdash; <span style="{{randomCSSStyle 3}}">{{randomColor}}</span></em>
       {{range $l := repeat 2}}
@@ -82,7 +82,7 @@
     </p>
     {{range $j := repeat 4}}
     <p>
-      {{markovParagraphs "default" 1 2 8 18 20}}
+      {{markovParagraphs "model.json" 1 2 8 18 20}}
       {{range $m := repeat 2}}
       <a href="{{randomQueryLink 2}}" style="{{randomCSSStyle 1}}">{{randomSentence 4}}</a>
       {{end}}
@@ -141,7 +141,7 @@
   <ul>
     {{range $i := repeat $recentProfiles}}
     <li class="recent {{randomClasses 2}}">
-      <a href="{{randomLink}}">{{markovSentence "default" 6}}</a>
+      <a href="{{randomLink}}">{{markovSentence "model.json" 6}}</a>
       {{range $q := repeat 1}}
       <a href="{{randomQueryLink 2}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
       {{end}}
