@@ -31,7 +31,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{markovSentence "default" (add 12 (div $aggression 8))}} - {{randomWord}}</title>
+    <title>{{markovSentence "model.json" (add 12 (div $aggression 8))}} - {{randomWord}}</title>
     <meta charset="UTF-8">
     {{ randomCSSVars $cssVars }}
     {{- range $i := repeat $styleBlockCount }}
@@ -52,7 +52,7 @@
 <body class="{{randomClasses (add 6 (div $aggression 10))}}" {{randomInlineStyle (add 6 (div $aggression 8))}}>
 {{nestDivs $mainDivs}}
 <header>
-    <h1>{{markovSentence "default" (add 12 (div $aggression 8))}}</h1>
+    <h1>{{markovSentence "model.json" (add 12 (div $aggression 8))}}</h1>
     <nav>
         {{range $i := repeat $navLinks}}
         <a href="{{randomQueryLink (add 2 (div $aggression 20))}}" class="nav {{randomClasses 2}}" style="{{randomCSSStyle (add 2 (div $aggression 10))}}">{{randomSentence (add 2 (div $aggression 10))}}</a>
@@ -63,8 +63,8 @@
 </header>
 <main>
     <section class="ugly">
-        <h2>{{markovSentence "default" (add 6 (div $aggression 8))}}</h2>
-        <p>{{markovParagraphs "default" (add 2 (div $aggression 10)) 3 8 16 26}}</p>
+        <h2>{{markovSentence "model.json" (add 6 (div $aggression 8))}}</h2>
+        <p>{{markovParagraphs "model.json" (add 2 (div $aggression 10)) 3 8 16 26}}</p>
         {{jsInteractiveContent "div" (randomSentence (add 8 (div $aggression 8)))}}
         {{nestDivs (add 4 (div $aggression 8))}}
     </section>
@@ -102,7 +102,7 @@
         </div>
         <div>
             <h3>Hydrated Example</h3>
-            {{jsInteractiveContent "div" (markovParagraphs "default" (add 1 (div $aggression 8)) 2 8 16 24)}}
+            {{jsInteractiveContent "div" (markovParagraphs "model.json" (add 1 (div $aggression 8)) 2 8 16 24)}}
         </div>
     </section>
     <aside class="aside">
@@ -132,7 +132,7 @@
         <h2>Tier 4: The Hammer</h2>
         {{- range repeat $jsContentCount }}
         <div class="component-loader {{ randomClasses 2 }}">
-            <h4>{{ markovSentence "tech" (randomInt 3 5) }}</h4>
+            <h4>{{ markovSentence "model.json" (randomInt 3 5) }}</h4>
             {{- $contentType := randomChoice (list "json" "text" "auth") -}}
             {{- $hiddenContent := "" -}}
             {{- if eq $contentType "json" -}}
@@ -140,7 +140,7 @@
             {{- else if eq $contentType "auth" -}}
             {{- $hiddenContent = printf "Token: %s" (randomString "hex" 64) -}}
             {{- else -}}
-            {{- $hiddenContent = markovParagraphs "default" 1 2 3 15 30 -}}
+            {{- $hiddenContent = markovParagraphs "model.json" 1 2 3 15 30 -}}
             {{- end -}}
             {{- jsInteractiveContent "div" $hiddenContent -}}
         </div>

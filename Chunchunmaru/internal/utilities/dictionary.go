@@ -36,3 +36,7 @@ func RandomWord() string {
 func WordCount() int {
 	return len(dict)
 }
+
+func GetWords() []string {
+	return dict
+}

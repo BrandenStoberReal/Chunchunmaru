@@ -2,18 +2,40 @@ package macros
 
 import (
 	"chunchunmaru/internal/utilities"
+	"github.com/mb-14/gomarkov"
 	"math/rand"
 	"strings"
 	"time"
 	"unicode"
 )
 
-func markovSentence(model string, length int) string {
-	return ""
+func markovSentence(modelpath string, length int) string {
+	model, err := utilities.LoadMarkovModel(modelpath)
+	if err != nil {
+		return ""
+	}
+	order := model.Order
+	tokens := make([]string, 0)
+	for i := 0; i < order; i++ {
+		tokens = append(tokens, gomarkov.StartToken)
+	}
+	for tokens[len(tokens)-1] != gomarkov.EndToken && len(tokens) < length {
+		next, _ := model.Generate(tokens[(len(tokens) - order):])
+		tokens = append(tokens, next)
+	}
+	return strings.Join(tokens[order:len(tokens)-1], " ") + "."
 }
 
-func markovParagraphs(model string, count, minSentences, maxSentences, minSentenceLength, maxSentenceLength int) string {
-	return ""
+func markovParagraphs(modelpath string, count, minSentences, maxSentences, minSentenceLength, maxSentenceLength int) string {
+	output := ""
+
+	for i := 0; i < count; i++ {
+		for j := 0; j < randomInt(minSentences, maxSentences); j++ {
+			output = output + markovSentence(modelpath, randomInt(minSentenceLength, maxSentenceLength)) + " "
+		}
+		output = output + "\n"
+	}
+	return output
 }
 
 func randomWord() string {
