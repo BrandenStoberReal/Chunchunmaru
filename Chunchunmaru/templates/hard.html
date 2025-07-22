@@ -1,0 +1,408 @@
+{{- /*
+=========================================================================================================
+|                                                                                                       |
+|                                   HARD TEMPLATE - AGGRESSION SCALED                                   |
+|                                                                                                       |
+| This template dynamically scales resource usage based on the .Aggression context variable (0-100).     |
+| Higher aggression = more DOM, CSS, JS, SVG, and client-side computation.                              |
+| Expensive macros are capped or offloaded to JS at high aggression to avoid server slowdown.           |
+=========================================================================================================
+*/}}
+{{- $aggression := .Aggression -}}
+{{- $tier2 := ge $aggression 25 -}}
+{{- $tier3 := ge $aggression 50 -}}
+{{- $tier4 := ge $aggression 75 -}}
+
+{{- $mainDivs := min 10 (add 7 (div $aggression 12)) -}}
+{{- $cssVars := add 24 (div $aggression 3) -}}
+{{- $styleBlockCount := add 2 (div $aggression 30) -}}
+{{- $cssRuleCount := add 20 (div $aggression 5) -}}
+{{- $navLinks := add 12 (div $aggression 8) -}}
+{{- $introParas := min 6 (add 3 (div $aggression 10)) -}}
+{{- $formFields := min 20 (add 14 (div $aggression 8)) -}}
+{{- $defListMin := min 12 (add 8 (div $aggression 8)) -}}
+{{- $defListMax := min 20 (add 14 (div $aggression 8)) -}}
+{{- $tableRows := min 14 (add 12 (div $aggression 8)) -}}
+{{- $tableCols := min 16 (add 14 (div $aggression 8)) -}}
+{{- $nestingDepth := min 24 (add 20 (div $aggression 7)) -}}
+{{- $quickLinks := min 24 (add 16 (div $aggression 8)) -}}
+{{- $recentUpdates := min 18 (add 10 (div $aggression 8)) -}}
+{{- $footerLinks := min 20 (add 14 (div $aggression 8)) -}}
+{{- $footerTableRows := min 8 (add 4 (div $aggression 8)) -}}
+{{- $footerTableCols := min 12 (add 8 (div $aggression 8)) -}}
+{{- $clientTableRows := add 18 (div $aggression 2) -}}
+{{- $clientTableCols := add 12 (div $aggression 2) -}}
+{{- $clientDivDepth := add 10 (div $aggression 3) -}}
+{{- $clientJSONDepth := add 4 (div $aggression 7) -}}
+{{- $clientWasteIters := mult 2e6 (add 1 (div $aggression 16)) -}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{markovSentence "default" 14}} Docs</title>
+    <meta charset="UTF-8">
+    {{ randomCSSVars $cssVars }}
+    {{- range $i := repeat $styleBlockCount }}
+    {{ $style := randomStyleBlock (randomChoice (list "complex" "nested" "utility")) $cssRuleCount }}{{ $style.Style }}
+    {{- end }}
+    <style>
+        html, body, .doc, .api, .example, .aside, .footer, .nav {
+        {{randomCSSStyle (add 32 (div $aggression 3))}}
+        }
+        a { {{randomCSSStyle (add 8 (div $aggression 8))}} }
+        {{- if gt $aggression 30 }}
+        {{- range repeat (div $aggression 10) }}
+        .{{ randomString "alphanum" 8 }} { {{ randomCSSStyle 1 }} }
+        {{- end }}
+        {{- end }}
+    </style>
+</head>
+<body class="{{randomClasses (add 8 (div $aggression 8))}}" {{randomInlineStyle (add 14 (div $aggression 7))}}>
+{{nestDivs $mainDivs}}
+<header>
+    <h1>{{markovSentence "default" 18}}</h1>
+    <nav>
+        {{range $i := repeat $navLinks}}
+        <a href="{{randomLink}}" class="nav {{randomClasses 2}}" style="{{randomCSSStyle 2}}">{{randomWord}}</a>
+        {{end}}
+    </nav>
+    {{randomSVG "filters"}}
+    {{- if $tier3 }}{{randomSVG "fractal"}}{{end}}
+</header>
+<main>
+    <section class="doc">
+        <h2>Introduction</h2>
+        <p>
+            {{if lt $aggression 60}}
+            {{markovParagraphs "default" $introParas 4 14 28 38}}
+            {{else}}
+            <span id="client-intro-placeholder"></span>
+            {{end}}
+        </p>
+        {{jsInteractiveContent "div" (randomSentence 18)}}
+    </section>
+    <section class="doc">
+        <h2>Getting Started</h2>
+        <ol>
+            {{if lt $aggression 60}}
+            {{range $i := repeat 8}}
+            <li>{{randomSentence 14}}</li>
+            {{end}}
+            {{else}}
+            <span id="client-gettingstarted-placeholder"></span>
+            {{end}}
+        </ol>
+        <div>
+            <h3>Sample Form</h3>
+            {{if lt $aggression 60}}
+            {{randomForm $formFields $formFields}}
+            {{else}}
+            <div id="client-form-placeholder"></div>
+            {{end}}
+        </div>
+    </section>
+    <section class="api">
+        <h2>API Reference</h2>
+        <dl>
+            {{if lt $aggression 60}}
+            {{range $item := randomDefinitionData $defListMin $defListMax}}
+            <dt>{{ $item.Term }}</dt>
+            <dd>{{ $item.Def }}</dd>
+            {{end}}
+            {{else}}
+            <span id="client-deflist-placeholder"></span>
+            {{end}}
+        </dl>
+        <h3>Example JSON</h3>
+        {{if lt $aggression 60}}
+        <pre>{{randomJSON 6 8 32}}</pre>
+        {{else}}
+        <pre id="client-json-placeholder"></pre>
+        {{end}}
+        <h3>API Table</h3>
+        {{if lt $aggression 60}}
+        {{randomComplexTable $tableRows $tableCols}}
+        {{else}}
+        <div id="client-table-placeholder"></div>
+        {{end}}
+    </section>
+    <section class="example">
+        <h2>Advanced Topics</h2>
+        <div>
+            <h3>Deeply Nested Example</h3>
+            {{if lt $aggression 60}}
+            {{nestDivs $nestingDepth}}
+            {{else}}
+            <div id="client-nest-placeholder"></div>
+            {{end}}
+        </div>
+        <div>
+            <h3>SVG Visualizations</h3>
+            {{randomSVG "fractal"}}
+            {{randomSVG "filters"}}
+        </div>
+        <div>
+            <h3>Hydrated Example</h3>
+            {{jsInteractiveContent "div" (markovParagraphs "default" 3 4 18 36 48)}}
+        </div>
+    </section>
+    <aside class="aside">
+        <h3>Quick Links</h3>
+        <ul>
+            {{if lt $aggression 60}}
+            {{range $i := repeat $quickLinks}}
+            <li><a href="{{randomLink}}">{{randomWord}}</a></li>
+            {{end}}
+            {{else}}
+            <span id="client-quicklinks-placeholder"></span>
+            {{end}}
+        </ul>
+        <h3>Recent Updates</h3>
+        <ul>
+            {{if lt $aggression 60}}
+            {{range $i := repeat $recentUpdates}}
+            <li>{{randomDate "2006-01-02" "2021-01-01" "2024-12-31"}}: {{randomSentence 10}}</li>
+            {{end}}
+            {{else}}
+            <span id="client-recentupdates-placeholder"></span>
+            {{end}}
+        </ul>
+        <h3>Sidebar SVG</h3>
+        {{randomSVG "fractal"}}
+        {{jsInteractiveContent "div" (randomSentence 20)}}
+    </aside>
+</main>
+<footer class="footer">
+    <p>Docs Portal &copy; {{randomDate "2006" "2010" "2030"}} {{randomWord}}</p>
+    <div>
+        {{if lt $aggression 60}}
+        {{range $i := repeat $footerLinks}}
+        <a href="{{randomLink}}" style="{{randomCSSStyle 2}}">{{randomWord}}</a>
+        {{end}}
+        {{else}}
+        <span id="client-footerlinks-placeholder"></span>
+        {{end}}
+    </div>
+    <div>
+        <h4>Footer Table</h4>
+        {{if lt $aggression 60}}
+        {{randomComplexTable $footerTableRows $footerTableCols}}
+        {{else}}
+        <div id="client-footer-table-placeholder"></div>
+        {{end}}
+    </div>
+    {{nestDivs 3}}
+    {{jsInteractiveContent "div" (randomSentence 16)}}
+</footer>
+{{if lt $aggression 60}}
+{{nestDivs 6}}
+{{else}}
+<div id="client-final-nest-placeholder"></div>
+{{end}}
+<script>
+    (function(){
+        // Utility functions for random content
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function randWord() {
+            const words = ["alpha","beta","gamma","delta","omega","zeta","lambda","sigma","tau","kappa","ugly","pain","chaos","junk","deep","table","svg","form","aside","footer","nav"];
+            return words[randInt(0, words.length-1)];
+        }
+        function randSentence(len) {
+            let s = [];
+            for(let i=0;i<len;i++) s.push(randWord());
+            let str = s.join(' ');
+            return str.charAt(0).toUpperCase() + str.slice(1) + '.';
+        }
+        // Generate a huge table (client-side)
+        function genTable(rows, cols) {
+            let t = document.createElement('table');
+            for(let i=0;i<rows;i++) {
+                let tr = document.createElement('tr');
+                for(let j=0;j<cols;j++) {
+                    let td = document.createElement('td');
+                    td.textContent = randWord() + ' ('+i+','+j+')';
+                    tr.appendChild(td);
+                }
+                t.appendChild(tr);
+            }
+            return t;
+        }
+        // Generate deeply nested divs (client-side)
+        function genNestedDivs(depth) {
+            let div = document.createElement('div');
+            div.className = 'deep';
+            let current = div;
+            for(let i=0;i<depth;i++) {
+                let inner = document.createElement('div');
+                inner.className = 'nested' + i;
+                inner.textContent = randWord();
+                current.appendChild(inner);
+                current = inner;
+            }
+            return div;
+        }
+        // Generate random SVG (client-side)
+        function genSVG() {
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "200");
+            svg.setAttribute("height", "200");
+            let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", "100");
+            circle.setAttribute("cy", "100");
+            circle.setAttribute("r", randInt(40,90));
+            circle.setAttribute("fill", "#"+Math.floor(Math.random()*16777215).toString(16));
+            svg.appendChild(circle);
+            return svg;
+        }
+        // Generate random JSON (client-side)
+        function genJSON(depth) {
+            if(depth<=0) return randWord();
+            let obj = {};
+            for(let i=0;i<randInt(2,5);i++) {
+                obj[randWord()] = genJSON(depth-1);
+            }
+            return obj;
+        }
+        // Generate a random form (client-side)
+        function genForm(fields) {
+            let form = document.createElement('form');
+            for(let i=0;i<fields;i++) {
+                let label = document.createElement('label');
+                label.textContent = randWord() + ': ';
+                let input = document.createElement('input');
+                input.type = 'text';
+                input.name = randWord();
+                label.appendChild(input);
+                form.appendChild(label);
+                form.appendChild(document.createElement('br'));
+            }
+            let btn = document.createElement('button');
+            btn.type = 'submit';
+            btn.textContent = 'Submit';
+            form.appendChild(btn);
+            return form;
+        }
+        // Generate definition list (client-side)
+        function genDefList(min, max) {
+            let dl = document.createElement('dl');
+            let count = randInt(min, max);
+            for(let i=0;i<count;i++) {
+                let dt = document.createElement('dt');
+                dt.textContent = randWord();
+                let dd = document.createElement('dd');
+                dd.textContent = randSentence(randInt(4,12));
+                dl.appendChild(dt);
+                dl.appendChild(dd);
+            }
+            return dl;
+        }
+        // Generate intro paragraphs (client-side)
+        function genIntroParas(count) {
+            let frag = document.createDocumentFragment();
+            for(let i=0;i<count;i++) {
+                let p = document.createElement('p');
+                p.textContent = randSentence(randInt(14,38));
+                frag.appendChild(p);
+            }
+            return frag;
+        }
+        // Generate getting started steps (client-side)
+        function genGettingStarted(count) {
+            let frag = document.createDocumentFragment();
+            for(let i=0;i<count;i++) {
+                let li = document.createElement('li');
+                li.textContent = randSentence(14);
+                frag.appendChild(li);
+            }
+            return frag;
+        }
+        // Generate quick links (client-side)
+        function genQuickLinks(count) {
+            let frag = document.createDocumentFragment();
+            for(let i=0;i<count;i++) {
+                let li = document.createElement('li');
+                let a = document.createElement('a');
+                a.href = '#';
+                a.textContent = randWord();
+                li.appendChild(a);
+                frag.appendChild(li);
+            }
+            return frag;
+        }
+        // Generate recent updates (client-side)
+        function genRecentUpdates(count) {
+            let frag = document.createDocumentFragment();
+            for(let i=0;i<count;i++) {
+                let li = document.createElement('li');
+                li.textContent = randWord() + ': ' + randSentence(10);
+                frag.appendChild(li);
+            }
+            return frag;
+        }
+        // Generate footer links (client-side)
+        function genFooterLinks(count) {
+            let frag = document.createDocumentFragment();
+            for(let i=0;i<count;i++) {
+                let a = document.createElement('a');
+                a.href = '#';
+                a.textContent = randWord();
+                a.setAttribute('style', '{{randomCSSStyle 2}}');
+                frag.appendChild(a);
+            }
+            return frag;
+        }
+        // Insert all heavy content
+        let sec = document.getElementById('client-heavy-content');
+        // Main content
+        // Introduction
+        let introPh = document.getElementById('client-intro-placeholder');
+        if(introPh) introPh.appendChild(genIntroParas({{$introParas}}));
+        // Getting Started
+        let gsPh = document.getElementById('client-gettingstarted-placeholder');
+        if(gsPh) gsPh.appendChild(genGettingStarted(8));
+        // Form
+        let formPh = document.getElementById('client-form-placeholder');
+        if(formPh) formPh.appendChild(genForm({{$formFields}}));
+        // Definition List
+        let defPh = document.getElementById('client-deflist-placeholder');
+        if(defPh) defPh.appendChild(genDefList({{$defListMin}}, {{$defListMax}}));
+        // JSON
+        let jph = document.getElementById('client-json-placeholder');
+        if(jph) jph.textContent = JSON.stringify(genJSON({{$clientJSONDepth}}), null, 2);
+        // Table
+        let tPh = document.getElementById('client-table-placeholder');
+        if(tPh) tPh.appendChild(genTable({{$tableRows}}, {{$tableCols}}));
+        // Nested divs
+        let nestPh = document.getElementById('client-nest-placeholder');
+        if(nestPh) nestPh.appendChild(genNestedDivs({{$nestingDepth}}));
+        // Quick Links
+        let qlPh = document.getElementById('client-quicklinks-placeholder');
+        if(qlPh) qlPh.appendChild(genQuickLinks({{$quickLinks}}));
+        // Recent Updates
+        let ruPh = document.getElementById('client-recentupdates-placeholder');
+        if(ruPh) ruPh.appendChild(genRecentUpdates({{$recentUpdates}}));
+        // Footer links
+        let flPh = document.getElementById('client-footerlinks-placeholder');
+        if(flPh) flPh.appendChild(genFooterLinks({{$footerLinks}}));
+        // Footer table
+        let ftable = document.getElementById('client-footer-table-placeholder');
+        if(ftable) ftable.appendChild(genTable({{$footerTableRows}}, {{$footerTableCols}}));
+        // Final nest
+        let finalNest = document.getElementById('client-final-nest-placeholder');
+        if(finalNest) finalNest.appendChild(genNestedDivs(8));
+        // Heavy content section
+        let heavy = document.getElementById('client-heavy-content');
+        if(heavy) {
+            heavy.appendChild(genTable({{$clientTableRows}}, {{$clientTableCols}}));
+            heavy.appendChild(genNestedDivs({{$clientDivDepth}}));
+            heavy.appendChild(genSVG());
+            let pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(genJSON({{$clientJSONDepth}}), null, 2);
+            heavy.appendChild(pre);
+            let waste = 0;
+            for(let i=0;i<{{$clientWasteIters}};i++) { waste += Math.sin(i) * Math.cos(i/2); }
+        }
+    })();
+</script>
+</body>
+</html>

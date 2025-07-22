@@ -1,0 +1,424 @@
+{{- /*
+=========================================================================================================
+|                                                                                                       |
+|                        FORM-THREAD TEMPLATE - AGGRESSION SCALED                                       |
+|                                                                                                       |
+| Dynamically scales resource usage based on the .Aggression context variable (0-100).                   |
+| Higher aggression = more DOM, CSS, JS, SVG, and client-side computation.                              |
+| Expensive macros are capped or offloaded to JS at high aggression to avoid server slowdown.           |
+=========================================================================================================
+*/}}
+{{- $aggression := .Aggression -}}
+{{- $tier2 := ge $aggression 25 -}}
+{{- $tier3 := ge $aggression 50 -}}
+{{- $tier4 := ge $aggression 75 -}}
+
+{{- $mainDivs := min 7 (add 5 (div $aggression 18)) -}}
+{{- $cssVars := add 10 (div $aggression 4) -}}
+{{- $styleBlockCount := add 1 (div $aggression 30) -}}
+{{- $cssRuleCount := add 10 (div $aggression 5) -}}
+{{- $navLinks := add 7 (div $aggression 8) -}}
+{{- $threadCount := min 6 (add 3 (div $aggression 16)) -}}
+{{- $replyCount := min 8 (add 3 (div $aggression 10)) -}}
+{{- $tableRows := min 6 (add 3 (div $aggression 8)) -}}
+{{- $tableCols := min 8 (add 5 (div $aggression 8)) -}}
+{{- $nestingDepth := min 8 (add 6 (div $aggression 7)) -}}
+{{- $clientTableRows := add 10 (div $aggression 2) -}}
+{{- $clientTableCols := add 6 (div $aggression 2) -}}
+{{- $clientDivDepth := add 4 (div $aggression 3) -}}
+{{- $clientJSONDepth := add 2 (div $aggression 7) -}}
+{{- $clientWasteIters := mult 1e6 (add 1 (div $aggression 18)) -}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{markovSentence "default" (add 8 (div $aggression 6))}} - {{randomWord}}</title>
+  <meta charset="UTF-8">
+  {{ randomCSSVars $cssVars }}
+  {{- range $i := repeat $styleBlockCount }}
+  {{ $style := randomStyleBlock (randomChoice (list "complex" "nested" "utility")) $cssRuleCount }}{{ $style.Style }}
+  {{- end }}
+  <style>
+    html, body, .thread, .post, .sidebar, .reply, .footer, .nav {
+    {{randomCSSStyle (add 14 (div $aggression 3))}}
+    }
+    a { {{randomCSSStyle (add 5 (div $aggression 8))}} }
+    {{- if gt $aggression 30 }}
+    {{- range repeat (div $aggression 10) }}
+    .{{ randomString "alphanum" 8 }} { {{ randomCSSStyle 1 }} }
+    {{- end }}
+    {{- end }}
+  </style>
+</head>
+<body class="{{randomClasses (add 6 (div $aggression 8))}}" {{randomInlineStyle (add 10 (div $aggression 7))}}>
+{{nestDivs $mainDivs}}
+<header>
+  <h1>{{markovSentence "default" (add 12 (div $aggression 7))}}</h1>
+  <nav>
+    {{range $i := repeat $navLinks}}
+    <a href="{{randomQueryLink (add 2 (div $aggression 12))}}" class="{{randomClasses 3}}" style="{{randomCSSStyle (add 2 (div $aggression 8))}}">{{randomWord}}</a>
+    {{end}}
+    {{range $i := repeat (div $aggression 20)}}
+    <a href="{{randomLink}}" class="{{randomClasses 2}}" style="{{randomCSSStyle 2}}">{{randomSentence 3}}</a>
+    {{end}}
+  </nav>
+  {{randomSVG "filters"}}
+  {{- if $tier3 }}{{randomSVG "fractal"}}{{end}}
+</header>
+<main>
+  {{if lt $aggression 60}}
+  <section class="thread">
+    <h2>{{markovSentence "default" 10}}</h2>
+    <div class="post {{randomClasses 3}}" {{randomInlineStyle 6}}>
+      <p>
+        <em>{{randomDate "2006-01-02" "2017-01-01" "2024-12-31"}} &mdash; {{randomString "username" 8}} &mdash; <span style="{{randomCSSStyle 3}}">{{randomColor}}</span></em>
+        {{range $l := repeat 2}}
+        <a href="{{randomLink}}" style="{{randomCSSStyle 2}}">{{randomWord}}</a>
+        {{end}}
+      </p>
+      {{range $j := repeat 3}}
+      <p>
+        {{markovParagraphs "default" 1 2 8 18 26}}
+        {{range $m := repeat 2}}
+        <a href="{{randomQueryLink 2}}" style="{{randomCSSStyle 1}}">{{randomSentence 4}}</a>
+        {{end}}
+      </p>
+      {{end}}
+      <section>
+        <h3>Attachments</h3>
+        <ul>
+          {{range $k := repeat 4}}
+          <li class="reply {{randomClasses 2}}" style="{{randomCSSStyle 2}}">
+            <strong>{{randomString "username" 6}}</strong>: {{randomSentence 8}} <span>{{randomDate "15:04:05" "00:00:00" "23:59:59"}}</span>
+            {{jsInteractiveContent "span" (randomSentence 6)}}
+            {{range $n := repeat 2}}
+            <a href="{{randomLink}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
+            {{end}}
+          </li>
+          {{end}}
+        </ul>
+      </section>
+      <section>
+        <h4>Post Data</h4>
+        <pre>{{randomJSON 3 4 16}}</pre>
+        {{range $o := repeat 2}}
+        <a href="{{randomQueryLink 3}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
+        {{end}}
+      </section>
+      <section>
+        <h4>Post Table</h4>
+        {{randomComplexTable $tableRows $tableCols}}
+        {{range $p := repeat 3}}
+        <a href="{{randomLink}}" style="{{randomCSSStyle 1}}">{{randomSentence 2}}</a>
+        {{end}}
+      </section>
+    </div>
+    {{range $i := repeat 3}}
+    <div class="reply {{randomClasses 2}}" {{randomInlineStyle 4}}>
+      <strong>{{randomString "username" 6}}</strong>: {{randomSentence 10}} <span>{{randomDate "15:04:05" "00:00:00" "23:59:59"}}</span>
+      {{jsInteractiveContent "span" (randomSentence 8)}}
+      {{range $n := repeat 2}}
+      <a href="{{randomLink}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
+      {{end}}
+    </div>
+    {{end}}
+  </section>
+  {{nestDivs $nestingDepth}}
+  {{else}}
+  <div id="client-thread-placeholder"></div>
+  <div id="client-nest-placeholder"></div>
+  {{end}}
+  <section>
+    <h4>Explore Threads</h4>
+    <ul>
+      {{range $i := repeat (add 8 (div $aggression 8))}}
+      <li><a href="{{randomLink}}" style="{{randomCSSStyle 1}}">{{randomSentence 3}}</a></li>
+      {{end}}
+    </ul>
+  </section>
+  <section id="client-heavy-content">
+    <h2>Dynamic Client-Side Suffering</h2>
+    <p>This section will be filled with heavy, random content by JavaScript after page load.</p>
+  </section>
+</main>
+<aside class="sidebar {{randomClasses 2}}">
+  <h3>Recent Threads</h3>
+  <ul>
+    {{range $i := repeat (add 7 (div $aggression 8))}}
+    <li class="recent {{randomClasses 2}}">
+      <a href="{{randomLink}}">{{markovSentence "default" 6}}</a>
+      {{range $q := repeat 1}}
+      <a href="{{randomQueryLink 2}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
+      {{end}}
+    </li>
+    {{end}}
+  </ul>
+  <h3>Tags</h3>
+  <ul>
+    {{range $i := repeat (add 10 (div $aggression 8))}}
+    <li class="tag {{randomClasses 2}}">
+      <a href="{{randomLink}}">{{randomWord}}</a>
+      {{range $r := repeat 1}}
+      <a href="{{randomQueryLink 1}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
+      {{end}}
+    </li>
+    {{end}}
+  </ul>
+  <h3>Sidebar Form</h3>
+  {{if lt $aggression 60}}
+  {{randomForm 6 8}}
+  {{else}}
+  <div id="client-form-placeholder"></div>
+  {{end}}
+  <h3>Sidebar SVG</h3>
+  {{randomSVG "fractal"}}
+  {{range $i := repeat 3}}
+  <a href="{{randomLink}}" style="{{randomCSSStyle 1}}">{{randomSentence 2}}</a>
+  {{end}}
+  {{if ge $aggression 60}}
+  <div id="client-aside-nest-placeholder"></div>
+  {{end}}
+</aside>
+<footer>
+  <p>&copy; {{randomDate "2006" "2015" "2024"}} {{randomWord}} Forum</p>
+  <nav>
+    {{range $i := repeat (add 6 (div $aggression 8))}}
+    <a href="{{randomLink}}" style="{{randomCSSStyle 2}}">{{randomWord}}</a>
+    {{end}}
+    {{range $i := repeat 3}}
+    <a href="{{randomQueryLink 2}}" style="{{randomCSSStyle 1}}">{{randomSentence 2}}</a>
+    {{end}}
+  </nav>
+  <div>
+    <h4>Footer JSON</h4>
+    {{if lt $aggression 60}}
+    <pre>{{randomJSON 2 3 12}}</pre>
+    {{else}}
+    <pre id="client-json-placeholder"></pre>
+    {{end}}
+    {{range $s := repeat 2}}
+    <a href="{{randomLink}}" style="{{randomCSSStyle 1}}">{{randomWord}}</a>
+    {{end}}
+  </div>
+  <div>
+    <h4>Footer Table</h4>
+    {{if lt $aggression 60}}
+    {{randomComplexTable 2 4}}
+    {{else}}
+    <div id="client-footer-table-placeholder"></div>
+    {{end}}
+    {{range $t := repeat 2}}
+    <a href="{{randomQueryLink 2}}" style="{{randomCSSStyle 1}}">{{randomSentence 2}}</a>
+    {{end}}
+  </div>
+  {{jsInteractiveContent "div" (randomSentence (add 10 (div $aggression 8)))}}
+  {{if ge $aggression 60}}
+  <div id="client-footer-nest-placeholder"></div>
+  {{end}}
+</footer>
+{{if lt $aggression 60}}
+{{nestDivs (add 3 (div $aggression 7))}}
+{{else}}
+<div id="client-final-nest-placeholder"></div>
+{{end}}
+<script>
+  (function(){
+    // Utility functions for random content
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randWord() {
+      const words = ["alpha","beta","gamma","delta","omega","zeta","lambda","sigma","tau","kappa","ugly","pain","chaos","junk","deep","table","svg","form","aside","footer","nav"];
+      return words[randInt(0, words.length-1)];
+    }
+    function randSentence(len) {
+      let s = [];
+      for(let i=0;i<len;i++) s.push(randWord());
+      let str = s.join(' ');
+      return str.charAt(0).toUpperCase() + str.slice(1) + '.';
+    }
+    // Generate a huge table (client-side)
+    function genTable(rows, cols) {
+      let t = document.createElement('table');
+      for(let i=0;i<rows;i++) {
+        let tr = document.createElement('tr');
+        for(let j=0;j<cols;j++) {
+          let td = document.createElement('td');
+          td.textContent = randWord() + ' ('+i+','+j+')';
+          tr.appendChild(td);
+        }
+        t.appendChild(tr);
+      }
+      return t;
+    }
+    // Generate deeply nested divs (client-side)
+    function genNestedDivs(depth) {
+      let div = document.createElement('div');
+      div.className = 'deep';
+      let current = div;
+      for(let i=0;i<depth;i++) {
+        let inner = document.createElement('div');
+        inner.className = 'nested' + i;
+        inner.textContent = randWord();
+        current.appendChild(inner);
+        current = inner;
+      }
+      return div;
+    }
+    // Generate random SVG (client-side)
+    function genSVG() {
+      let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("width", "200");
+      svg.setAttribute("height", "200");
+      let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", "100");
+      circle.setAttribute("cy", "100");
+      circle.setAttribute("r", randInt(40,90));
+      circle.setAttribute("fill", "#"+Math.floor(Math.random()*16777215).toString(16));
+      svg.appendChild(circle);
+      return svg;
+    }
+    // Generate random JSON (client-side)
+    function genJSON(depth) {
+      if(depth<=0) return randWord();
+      let obj = {};
+      for(let i=0;i<randInt(2,5);i++) {
+        obj[randWord()] = genJSON(depth-1);
+      }
+      return obj;
+    }
+    // Generate a random form (client-side)
+    function genForm(fields) {
+      let form = document.createElement('form');
+      for(let i=0;i<fields;i++) {
+        let label = document.createElement('label');
+        label.textContent = randWord() + ': ';
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.name = randWord();
+        label.appendChild(input);
+        form.appendChild(label);
+        form.appendChild(document.createElement('br'));
+      }
+      let btn = document.createElement('button');
+      btn.type = 'submit';
+      btn.textContent = 'Submit';
+      form.appendChild(btn);
+      return form;
+    }
+    // Generate thread/post (client-side)
+    function genThread(replyCount, tableRows, tableCols, nestingDepth) {
+      let frag = document.createDocumentFragment();
+      let section = document.createElement('section');
+      section.className = 'thread';
+      let h2 = document.createElement('h2');
+      h2.textContent = randSentence(10);
+      section.appendChild(h2);
+      let postDiv = document.createElement('div');
+      postDiv.className = 'post';
+      let p = document.createElement('p');
+      p.innerHTML = '<em>' + randWord() + ' &mdash; ' + randWord() + randWord() + ' &mdash; <span>' + randWord() + '</span></em>';
+      postDiv.appendChild(p);
+      for(let j=0;j<3;j++) {
+        let para = document.createElement('p');
+        para.textContent = randSentence(randInt(8,26));
+        for(let m=0;m<2;m++) {
+          let a = document.createElement('a');
+          a.href = '#';
+          a.textContent = randSentence(4);
+          para.appendChild(document.createTextNode(' '));
+          para.appendChild(a);
+        }
+        postDiv.appendChild(para);
+      }
+      // Attachments
+      let attachSection = document.createElement('section');
+      let h3 = document.createElement('h3');
+      h3.textContent = 'Attachments';
+      attachSection.appendChild(h3);
+      let ul = document.createElement('ul');
+      for(let k=0;k<4;k++) {
+        let li = document.createElement('li');
+        li.className = 'reply';
+        li.innerHTML = '<strong>' + randWord() + randWord() + '</strong>: ' + randSentence(8) + ' <span>' + randWord() + '</span>';
+        for(let n=0;n<2;n++) {
+          let a = document.createElement('a');
+          a.href = '#';
+          a.textContent = randWord();
+          li.appendChild(document.createTextNode(' '));
+          li.appendChild(a);
+        }
+        ul.appendChild(li);
+      }
+      attachSection.appendChild(ul);
+      postDiv.appendChild(attachSection);
+      // Post Data (JSON)
+      let dataSection = document.createElement('section');
+      let h4 = document.createElement('h4');
+      h4.textContent = 'Post Data';
+      dataSection.appendChild(h4);
+      let pre = document.createElement('pre');
+      pre.textContent = JSON.stringify(genJSON(3), null, 2);
+      dataSection.appendChild(pre);
+      postDiv.appendChild(dataSection);
+      // Post Table
+      let tableSection = document.createElement('section');
+      let h4t = document.createElement('h4');
+      h4t.textContent = 'Post Table';
+      tableSection.appendChild(h4t);
+      tableSection.appendChild(genTable(tableRows, tableCols));
+      postDiv.appendChild(tableSection);
+      section.appendChild(postDiv);
+      // Replies
+      for(let i=0;i<3;i++) {
+        let replyDiv = document.createElement('div');
+        replyDiv.className = 'reply';
+        replyDiv.innerHTML = '<strong>' + randWord() + randWord() + '</strong>: ' + randSentence(10) + ' <span>' + randWord() + '</span>';
+        for(let n=0;n<2;n++) {
+          let a = document.createElement('a');
+          a.href = '#';
+          a.textContent = randWord();
+          replyDiv.appendChild(document.createTextNode(' '));
+          replyDiv.appendChild(a);
+        }
+        section.appendChild(replyDiv);
+      }
+      frag.appendChild(section);
+      return frag;
+    }
+    // Insert all heavy content
+    let sec = document.getElementById('client-heavy-content');
+    sec.appendChild(genTable({{$clientTableRows}}, {{$clientTableCols}}));
+    sec.appendChild(genNestedDivs({{$clientDivDepth}}));
+    sec.appendChild(genSVG());
+    let pre = document.createElement('pre');
+    pre.textContent = JSON.stringify(genJSON({{$clientJSONDepth}}), null, 2);
+    sec.appendChild(pre);
+    let waste = 0;
+    for(let i=0;i<{{$clientWasteIters}};i++) { waste += Math.sin(i) * Math.cos(i/2); }
+
+    // Fill placeholders if high aggression
+    {{if ge $aggression 60}}
+    let replyCount = {{$replyCount}}, tableRows = {{$tableRows}}, tableCols = {{$tableCols}}, nestingDepth = {{$nestingDepth}};
+    let threadPh = document.getElementById('client-thread-placeholder');
+    if(threadPh) threadPh.appendChild(genThread(replyCount, tableRows, tableCols, nestingDepth));
+    let nestPh = document.getElementById('client-nest-placeholder');
+    if(nestPh) nestPh.appendChild(genNestedDivs(nestingDepth));
+    let asideNest = 4, footerNest = 3;
+    let aph = document.getElementById('client-aside-nest-placeholder');
+    if(aph) aph.appendChild(genNestedDivs(asideNest));
+    let fph = document.getElementById('client-footer-nest-placeholder');
+    if(fph) fph.appendChild(genNestedDivs(footerNest));
+    let ftable = document.getElementById('client-footer-table-placeholder');
+    if(ftable) ftable.appendChild(genTable(4, 8));
+    let finalNest = document.getElementById('client-final-nest-placeholder');
+    if(finalNest) finalNest.appendChild(genNestedDivs(footerNest));
+    // JSON
+    let jph = document.getElementById('client-json-placeholder');
+    if(jph) jph.textContent = JSON.stringify(genJSON(3), null, 2);
+    // Form
+    let formph = document.getElementById('client-form-placeholder');
+    if(formph) formph.appendChild(genForm(8));
+    {{end}}
+  })();
+</script>
+</body>
+</html>

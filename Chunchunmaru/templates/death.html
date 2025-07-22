@@ -1,0 +1,253 @@
+{{- /*
+=========================================================================================================
+|                                                                                                       |
+|                                   DEATH TEMPLATE - AGGRESSION SCALED                                  |
+|                                                                                                       |
+| This template dynamically scales resource usage based on the .Aggression context variable (0-100).     |
+| Higher aggression = more DOM, CSS, JS, SVG, and client-side computation.                              |
+=========================================================================================================
+*/}}
+{{- $aggression := .Aggression -}}
+{{- $tier2 := ge $aggression 25 -}}
+{{- $tier3 := ge $aggression 50 -}}
+{{- $tier4 := ge $aggression 75 -}}
+
+{{- $mainDivs := add 4 (div $aggression 20) -}}
+{{- $cssVars := add 12 (div $aggression 6) -}}
+{{- $styleBlockCount := add 2 (div $aggression 30) -}}
+{{- $cssRuleCount := add 8 (div $aggression 5) -}}
+{{- $navLinks := add 4 (div $aggression 10) -}}
+{{- $tableRows := add 2 (div $aggression 8) -}}
+{{- $tableCols := add 2 (div $aggression 8) -}}
+{{- $defListCount := add 2 (div $aggression 12) -}}
+{{- $nestingDepth := add 4 (div $aggression 7) -}}
+{{- $clientTableRows := add 20 (div $aggression 2) -}}
+{{- $clientTableCols := add 10 (div $aggression 2) -}}
+{{- $clientDivDepth := add 8 (div $aggression 4) -}}
+{{- $clientJSONDepth := add 2 (div $aggression 8) -}}
+{{- $clientWasteIters := mult 1e6 (add 1 (div $aggression 20)) -}}
+{{- $jsContentCount := add 1 (div (sub $aggression 60) 10) -}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{markovSentence "default" (add 12 (div $aggression 8))}} - {{randomWord}}</title>
+    <meta charset="UTF-8">
+    {{ randomCSSVars $cssVars }}
+    {{- range $i := repeat $styleBlockCount }}
+    {{ $style := randomStyleBlock (randomChoice (list "complex" "nested" "utility")) $cssRuleCount }}{{ $style.Style }}
+    {{- end }}
+    <style>
+        html, body, .ugly, .pain, .random, .chaos, .deep, .table, .svg, .form, .aside, .footer, .nav, .junk {
+        {{randomCSSStyle (add 12 (div $aggression 4))}}
+        }
+        a { {{randomCSSStyle (add 3 (div $aggression 10))}} }
+        {{- if gt $aggression 30 }}
+        {{- range repeat (div $aggression 12) }}
+        .{{ randomString "alphanum" 8 }} { {{ randomCSSStyle 1 }} }
+        {{- end }}
+        {{- end }}
+    </style>
+</head>
+<body class="{{randomClasses (add 6 (div $aggression 10))}}" {{randomInlineStyle (add 6 (div $aggression 8))}}>
+{{nestDivs $mainDivs}}
+<header>
+    <h1>{{markovSentence "default" (add 12 (div $aggression 8))}}</h1>
+    <nav>
+        {{range $i := repeat $navLinks}}
+        <a href="{{randomQueryLink (add 2 (div $aggression 20))}}" class="nav {{randomClasses 2}}" style="{{randomCSSStyle (add 2 (div $aggression 10))}}">{{randomSentence (add 2 (div $aggression 10))}}</a>
+        {{end}}
+        {{randomSVG "filters"}}
+        {{- if $tier3 }}{{randomSVG "fractal"}}{{end}}
+    </nav>
+</header>
+<main>
+    <section class="ugly">
+        <h2>{{markovSentence "default" (add 6 (div $aggression 8))}}</h2>
+        <p>{{markovParagraphs "default" (add 2 (div $aggression 10)) 3 8 16 26}}</p>
+        {{jsInteractiveContent "div" (randomSentence (add 8 (div $aggression 8)))}}
+        {{nestDivs (add 4 (div $aggression 8))}}
+    </section>
+    <section class="pain">
+        <h2>Randomized Table Hell</h2>
+        {{randomComplexTable $tableRows $tableCols}}
+        <div>
+            <h3>Sample Form</h3>
+            {{randomForm (add 4 (div $aggression 8)) (add 4 (div $aggression 8))}}
+        </div>
+    </section>
+    <section class="chaos">
+        <h2>API Reference</h2>
+        <dl>
+            {{range $item := randomDefinitionData $defListCount (add 6 (div $aggression 8))}}
+            <dt>{{ $item.Term }}</dt>
+            <dd>{{ $item.Def }}</dd>
+            {{end}}
+        </dl>
+        <h3>Example JSON</h3>
+        <pre>{{randomJSON (max 1 (add 2 (div $aggression 8))) (max 1 (add 2 (div $aggression 8))) (max 1 (add 8 (div $aggression 8)))}}</pre>
+        <h3>API Table</h3>
+        {{randomComplexTable (add 2 (div $aggression 8)) (add 2 (div $aggression 8))}}
+    </section>
+    <section class="junk">
+        <h2>Advanced Topics</h2>
+        <div>
+            <h3>Deeply Nested Example</h3>
+            {{nestDivs (add 8 (div $aggression 8))}}
+        </div>
+        <div>
+            <h3>SVG Visualizations</h3>
+            {{randomSVG "fractal"}}
+            {{randomSVG "filters"}}
+        </div>
+        <div>
+            <h3>Hydrated Example</h3>
+            {{jsInteractiveContent "div" (markovParagraphs "default" (add 1 (div $aggression 8)) 2 8 16 24)}}
+        </div>
+    </section>
+    <aside class="aside">
+        <h3>Quick Links</h3>
+        <ul>
+            {{range $i := repeat (add 8 (div $aggression 8))}}
+            <li><a href="{{randomLink}}">{{randomSentence (add 2 (div $aggression 8))}}</a></li>
+            {{end}}
+        </ul>
+        <h3>Recent Updates</h3>
+        <ul>
+            {{range $i := repeat (add 6 (div $aggression 8))}}
+            <li>{{randomDate "2006-01-02" "2000-01-01" "2024-12-31"}}: {{randomSentence (add 4 (div $aggression 8))}}</li>
+            {{end}}
+        </ul>
+        <h3>Sidebar SVG</h3>
+        {{randomSVG "fractal"}}
+        {{jsInteractiveContent "div" (randomSentence (add 6 (div $aggression 8)))}}
+        {{nestDivs (add 3 (div $aggression 8))}}
+    </aside>
+    <section id="client-heavy-content">
+        <h2>Dynamic Client-Side Suffering</h2>
+        <p>This section will be filled with heavy, random content by JavaScript after page load.</p>
+    </section>
+    {{- if $tier4 }}
+    <section class="hammer">
+        <h2>Tier 4: The Hammer</h2>
+        {{- range repeat $jsContentCount }}
+        <div class="component-loader {{ randomClasses 2 }}">
+            <h4>{{ markovSentence "tech" (randomInt 3 5) }}</h4>
+            {{- $contentType := randomChoice (list "json" "text" "auth") -}}
+            {{- $hiddenContent := "" -}}
+            {{- if eq $contentType "json" -}}
+            {{- $hiddenContent = randomJSON (add 2 (div $aggression 10)) -}}
+            {{- else if eq $contentType "auth" -}}
+            {{- $hiddenContent = printf "Token: %s" (randomString "hex" 64) -}}
+            {{- else -}}
+            {{- $hiddenContent = markovParagraphs "default" 1 2 3 15 30 -}}
+            {{- end -}}
+            {{- jsInteractiveContent "div" $hiddenContent -}}
+        </div>
+        {{- end }}
+        <div>
+            <h3>Fractal Hammer</h3>
+            {{randomSVG "fractal"}}
+        </div>
+        {{nestDivs (add 8 (div $aggression 8))}}
+    </section>
+    {{- end }}
+</main>
+<footer class="footer">
+    <p>Ugly Portal &copy; {{randomDate "2006" "1990" "2035"}} {{randomWord}}</p>
+    <div>
+        {{range $i := repeat (add 8 (div $aggression 8))}}
+        <a href="{{randomQueryLink (add 2 (div $aggression 8))}}" style="{{randomCSSStyle (add 2 (div $aggression 8))}}">{{randomSentence (add 2 (div $aggression 8))}}</a>
+        {{end}}
+    </div>
+    <div>
+        <h4>Footer Table</h4>
+        {{randomComplexTable (add 2 (div $aggression 8)) (add 2 (div $aggression 8))}}
+    </div>
+    {{nestDivs (add 3 (div $aggression 8))}}
+    {{jsInteractiveContent "div" (randomSentence (add 8 (div $aggression 8)))}}
+</footer>
+{{nestDivs (add 4 (div $aggression 8))}}
+<script>
+    (function(){
+        // Utility functions for random content
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function randWord() {
+            const words = ["alpha","beta","gamma","delta","omega","zeta","lambda","sigma","tau","kappa","ugly","pain","chaos","junk","deep","table","svg","form","aside","footer","nav"];
+            return words[randInt(0, words.length-1)];
+        }
+        function randSentence(len) {
+            let s = [];
+            for(let i=0;i<len;i++) s.push(randWord());
+            let str = s.join(' ');
+            return str.charAt(0).toUpperCase() + str.slice(1) + '.';
+        }
+        // Generate a huge table (client-side)
+        function genTable(rows, cols) {
+            let t = document.createElement('table');
+            for(let i=0;i<rows;i++) {
+                let tr = document.createElement('tr');
+                for(let j=0;j<cols;j++) {
+                    let td = document.createElement('td');
+                    td.textContent = randWord() + ' ('+i+','+j+')';
+                    tr.appendChild(td);
+                }
+                t.appendChild(tr);
+            }
+            return t;
+        }
+        // Generate deeply nested divs (client-side)
+        function genNestedDivs(depth) {
+            let div = document.createElement('div');
+            div.className = 'deep';
+            let current = div;
+            for(let i=0;i<depth;i++) {
+                let inner = document.createElement('div');
+                inner.className = 'nested' + i;
+                inner.textContent = randWord();
+                current.appendChild(inner);
+                current = inner;
+            }
+            return div;
+        }
+        // Generate random SVG (client-side)
+        function genSVG() {
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "200");
+            svg.setAttribute("height", "200");
+            let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", "100");
+            circle.setAttribute("cy", "100");
+            circle.setAttribute("r", randInt(40,90));
+            circle.setAttribute("fill", "#"+Math.floor(Math.random()*16777215).toString(16));
+            svg.appendChild(circle);
+            return svg;
+        }
+        // Generate random JSON (client-side)
+        function genJSON(depth) {
+            if(depth<=0) return randWord();
+            let obj = {};
+            for(let i=0;i<randInt(2,5);i++) {
+                obj[randWord()] = genJSON(depth-1);
+            }
+            return obj;
+        }
+        // Insert all heavy content
+        let sec = document.getElementById('client-heavy-content');
+        // Table
+        sec.appendChild(genTable({{$clientTableRows}}, {{$clientTableCols}}));
+        // Nested divs
+        sec.appendChild(genNestedDivs({{$clientDivDepth}}));
+        // SVG
+        sec.appendChild(genSVG());
+        // JSON
+        let pre = document.createElement('pre');
+        pre.textContent = JSON.stringify(genJSON({{$clientJSONDepth}}), null, 2);
+        sec.appendChild(pre);
+        // CPU-intensive JS
+        let waste = 0;
+        for(let i=0;i<{{$clientWasteIters}};i++) { waste += Math.sin(i) * Math.cos(i/2); }
+    })();
+</script>
+</body>
+</html>
