@@ -2,18 +2,16 @@ package utilities
 
 import (
 	"errors"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 // RandomHTMLFromDir selects a random .html file from dir and returns its contents as a string alongside the file name.
 func RandomHTMLFromDir(dir string) (string, string, error) {
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return "", "", err
 	}
@@ -29,7 +27,6 @@ func RandomHTMLFromDir(dir string) (string, string, error) {
 		return "", "", errors.New("no HTML files found in directory")
 	}
 
-	rand.Seed(time.Now().UnixNano())
 	randomFile := htmlFiles[rand.Intn(len(htmlFiles))]
 
 	content, err := os.ReadFile(randomFile)

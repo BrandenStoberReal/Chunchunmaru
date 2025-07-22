@@ -35,17 +35,17 @@ func RandomStringFromCharset(length int, charset string) string {
 	return string(b)
 }
 
-// randomKeyword selects a random item from a slice of strings.
+// RandomKeyword Selects a random item from a slice of strings.
 func RandomKeyword(keywords []string) string {
 	return keywords[rand.Intn(len(keywords))]
 }
 
-// randomHexColor generates a random hexadecimal color.
+// RandomHexColor Generates a random hexadecimal color.
 func RandomHexColor() string {
 	return fmt.Sprintf("#%06x", rand.Intn(0xFFFFFF))
 }
 
-// Helper: reverse a string
+// ReverseString Helper: reverse a string
 func ReverseString(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -54,12 +54,12 @@ func ReverseString(s string) string {
 	return string(runes)
 }
 
-// Helper: hex encode a string
+// HexEncode Helper: hex encode a string
 func HexEncode(s string) string {
 	return fmt.Sprintf("%x", s)
 }
 
-// Helper: xor encode a string with a key
+// XorEncode Helper: xor encode a string with a key
 func XorEncode(s string, key byte) string {
 	b := []byte(s)
 	for i := range b {

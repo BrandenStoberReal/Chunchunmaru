@@ -27,5 +27,5 @@ func TestChainGenerate(t *testing.T) {
 		next, _ := chain.Generate(tokens[(len(tokens) - order):])
 		tokens = append(tokens, next)
 	}
-	printTestResults("Build Chain", strings.Join(tokens[order:len(tokens)-1], " "))
+	printTestResults("Train & Test Markov Chain", strings.Join(tokens[order:len(tokens)-1], " "))
 }
