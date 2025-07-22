@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Chunchunmaru FreeBSD arm" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="Build Specific OS's">
+    <module name="Chunchunmaru" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="GOARCH" value="arm" />
+      <env name="GOOS" value="freebsd" />
+    </envs>
+    <kind value="FILE" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/Chunchunmaru/main.go" />
+    <output_directory value="$PROJECT_DIR$/Chunchunmaru/build" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>
