@@ -3,6 +3,8 @@
 
 Chunchunmaru is a defensive tool designed to protect websites from unauthorized scraping. It dynamically generates a web of convincing, believable, and resource-intensive pages that are delivered with adaptive throttling. The primary goal is to waste a scraper's resources (CPU, time, network), pollute its dataset with plausible-sounding junk, and ultimately make scraping a given site prohibitively expensive—all without being easily detected as an artificial trap.
 
+![Crashed Tab Image](https://files.catbox.moe/gimu54.png)
+
 ### Core Principles
 
 *   **Resource Asymmetry:** The server is exceptionally lightweight. Content models are loaded once at startup, and page generation is computationally cheap. The system is designed to impose a high cost on the client (scraper) relative to the low cost on the server.
@@ -81,3 +83,6 @@ This creates a feedback loop: the more that a scraper requests, the more hostile
 | `randomSVG "type"`                    | <br/>Generates an inline `<svg>` designed to be computationally expensive for the rendering engine, while keeping the data payload reasonable.<br/>Types: `fractal` (path data for a recursive fractal), `filters` (a stack of complex SVG filters applied to a simple element).                                                                                                                                                                                             |
 | `randomCSSVars count`                 | <br/>Generates a `<style>` block defining a long chain of interdependent CSS Custom Properties (e.g., `--v2: calc(var(--v1) * 1.5)`).<br/>Forces a recursive calculation workload on the CSS engine.                                                                                                                                                                                                                                                                         |
 | `jsInteractiveContent "type" content` | <br/>Generates a placeholder element and an inline script. The script first performs a CPU-intensive calculation, then decodes the `content` (e.g., from Base64) and uses standard DOM manipulation to inject it into the placeholder.<br/>This mimics a modern "hydrating" web component, making the CPU drain and content obfuscation a single, plausible, and necessary step for the scraper to get the content.<br/>Type dictates the placeholder (e.g., `div`, `span`). |
+
+### Credits
+CTAG07 - Minor Math Contributions + Initial Concept
