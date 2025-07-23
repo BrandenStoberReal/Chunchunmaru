@@ -25,6 +25,14 @@ func init() {
 	startTime = time.Now()
 }
 
+func handleWebError(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+}
+
+func handleWebErrorWithMessage(w http.ResponseWriter, err string) {
+	http.Error(w, err, http.StatusInternalServerError)
+}
+
 func main() {
 	// Entrypoint
 	log.Println("Welcome to Chunchunmaru!")
@@ -47,6 +55,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Add("Content-Type", "application/json")
 		switch request.URL.Path {
 		case "/api/server/info":
+			// Provides generic server info to the client
 			reply := utilities.ApiBaseReply{
 				AppVersion: "1.0.0",
 				Uptime:     uptime().Seconds(),
@@ -54,22 +63,23 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			replybytes, marshalerr := json.Marshal(reply)
 			if marshalerr != nil {
 				log.Println("Error marshalling json ", marshalerr)
-				http.Error(writer, marshalerr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, marshalerr)
 				return
 			}
 			_, writeerr := writer.Write(replybytes)
 			if writeerr != nil {
 				log.Println("Error writing json ", writeerr)
-				http.Error(writer, writeerr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, writeerr)
 				return
 			}
 			break
 		case "/api/templates/info":
+			// Provides misc template information to the client
 			filenames := make([]string, 0)
 			files, readerr := os.ReadDir("templates")
 			if readerr != nil {
 				log.Println("Error reading templates dir ", readerr)
-				http.Error(writer, readerr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, readerr)
 				return
 			}
 			for _, file := range files {
@@ -82,13 +92,13 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			replybytes, marshalerr := json.Marshal(reply)
 			if marshalerr != nil {
 				log.Println("Error marshalling json ", marshalerr)
-				http.Error(writer, marshalerr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, marshalerr)
 				return
 			}
 			_, writeerr := writer.Write(replybytes)
 			if writeerr != nil {
 				log.Println("Error writing json ", writeerr)
-				http.Error(writer, writeerr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, writeerr)
 				return
 			}
 			break
@@ -98,31 +108,32 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 		// POST api methods
 		switch request.URL.Path {
 		case "/api/templates/upload":
+			// Allow a client to upload a template to the web server for serving
 			decoder := json.NewDecoder(request.Body)
 			var data utilities.ApiUploadTemplateData
 			decoderr := decoder.Decode(&data)
 			if decoderr != nil {
 				log.Println("Error decoding json ", decoderr)
-				http.Error(writer, decoderr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, decoderr)
 				return
 			}
 			if data.FileName == "" && data.ContentBase64 == "" {
 				decodedhtml, base64err := base64.StdEncoding.DecodeString(data.ContentBase64)
 				if base64err != nil {
 					log.Println("Error decoding base64 ", base64err)
-					http.Error(writer, base64err.Error(), http.StatusInternalServerError)
+					handleWebError(writer, base64err)
 					return
 				}
 				writefilerr := os.WriteFile("templates/"+data.FileName, decodedhtml, 0644)
 				if writefilerr != nil {
 					log.Println("Error writing file ", writefilerr)
-					http.Error(writer, writefilerr.Error(), http.StatusInternalServerError)
+					handleWebError(writer, writefilerr)
 					return
 				}
 				writer.Header().Add("Content-Type", "text/html")
 				writer.Write([]byte("OK"))
 			} else {
-				http.Error(writer, "Both JSON fields must not be empty.", http.StatusInternalServerError)
+				handleWebErrorWithMessage(writer, "Both JSON fields must not be empty.")
 				return
 			}
 			break
@@ -132,7 +143,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			decoderr := decoder.Decode(&data)
 			if decoderr != nil {
 				log.Println("Error decoding json ", decoderr)
-				http.Error(writer, decoderr.Error(), http.StatusInternalServerError)
+				handleWebError(writer, decoderr)
 				return
 			}
 			if data.FileName != "" {
@@ -140,17 +151,17 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 					delfileerr := os.Remove("templates/" + data.FileName)
 					if delfileerr != nil {
 						log.Println("Error deleting file ", delfileerr)
-						http.Error(writer, delfileerr.Error(), http.StatusInternalServerError)
+						handleWebError(writer, delfileerr)
 						return
 					}
 					writer.Header().Add("Content-Type", "text/html")
 					writer.Write([]byte("OK"))
 				} else {
-					http.Error(writer, "File does not exist.", http.StatusInternalServerError)
+					handleWebErrorWithMessage(writer, "File does not exist.")
 					return
 				}
 			} else {
-				http.Error(writer, "JSON field \"fileName\" must not be empty.", http.StatusInternalServerError)
+				handleWebErrorWithMessage(writer, "JSON field \"fileName\" must not be empty.")
 				return
 			}
 			break
@@ -158,7 +169,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 		break
 	default:
 		// Client used an unsupported request method
-		http.Error(writer, "Unsupported method \""+request.Method+"\".", http.StatusMethodNotAllowed)
+		handleWebErrorWithMessage(writer, "Unsupported method \""+request.Method+"\".")
 		break
 	}
 }
