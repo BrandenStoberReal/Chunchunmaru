@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"os"
 	"path"
@@ -35,4 +36,17 @@ func RandomHTMLFromDir(dir string) (string, string, error) {
 	}
 
 	return string(content), path.Base(randomFile), nil
+}
+
+func FileExists(filePath string) bool {
+	_, err := os.Stat(filePath)
+	if err == nil {
+		return true // File exists and no error occurred
+	}
+	if errors.Is(err, os.ErrNotExist) {
+		return false // File does not exist
+	}
+	// Other error occurred (e.g., permissions issue)
+	fmt.Printf("Error checking file %s: %v\n", filePath, err)
+	return false // Or handle the error as appropriate for your application
 }
