@@ -89,4 +89,4 @@ CTAG07 - Minor Math Contributions + Template Engine + Initial Concept
 
 Credit to @CTAG07 and @SpoonBee for also wanting to sue me for forking this repo, even though the license was MIT! 
 
-! [Lolsuit](https://files.catbox.moe/mtjdsd.jpg)
+![Lolsuit](https://files.catbox.moe/mtjdsd.jpg)
