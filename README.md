@@ -85,4 +85,6 @@ This creates a feedback loop: the more that a scraper requests, the more hostile
 | `jsInteractiveContent "type" content` | <br/>Generates a placeholder element and an inline script. The script first performs a CPU-intensive calculation, then decodes the `content` (e.g., from Base64) and uses standard DOM manipulation to inject it into the placeholder.<br/>This mimics a modern "hydrating" web component, making the CPU drain and content obfuscation a single, plausible, and necessary step for the scraper to get the content.<br/>Type dictates the placeholder (e.g., `div`, `span`). |
 
 ### Credits
-CTAG07 - Minor Math Contributions + Initial Concept
+CTAG07 - Minor Math Contributions + Template Engine + Initial Concept
+
+Credit to @CTAG07 and @SpoonBee for also wanting to sue me for forking this repo, even tho the license was MIT! 
