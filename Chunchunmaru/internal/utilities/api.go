@@ -15,6 +15,10 @@ type ApiTemplateInfoReply struct {
 	TotalDiskUsage int64    `json:"totalDiskUsage"`
 }
 
+type ApiQueryInfoReply struct {
+	TotalQueries int `json:"totalQueries"`
+}
+
 type IpInfoStruct struct {
 	Ip      string `json:"ip"`
 	Queries int    `json:"queries"`

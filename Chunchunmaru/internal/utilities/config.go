@@ -40,12 +40,13 @@ func (d *Duration) MarshalJSON() ([]byte, error) {
 }
 
 type Config struct {
-	Port          int      `json:"port"`
-	Delay         Duration `json:"delay"`
-	HostName      string   `json:"hostname"`
-	PathWhitelist []string `json:"path_whitelist"`
-	MinSubpaths   int      `json:"min_subpaths"`
-	MaxSubpaths   int      `json:"max_subpaths"`
+	Port                 int      `json:"port"`
+	Delay                Duration `json:"delay"`
+	HostName             string   `json:"hostname"`
+	PathWhitelist        []string `json:"path_whitelist"`
+	MinSubpaths          int      `json:"min_subpaths"`
+	MaxSubpaths          int      `json:"max_subpaths"`
+	QueriesPerAggression int      `json:"queries_per_aggression"`
 }
 
 type ConfigManager struct {
@@ -61,12 +62,13 @@ func NewConfigManager(initialConfig Config) *ConfigManager {
 }
 
 var AppConfig = NewConfigManager(Config{
-	Port:          8080,
-	Delay:         Duration(5000 * time.Millisecond),
-	HostName:      "http://localhost:8080",
-	PathWhitelist: []string{},
-	MinSubpaths:   1,
-	MaxSubpaths:   5,
+	Port:                 8080,
+	Delay:                Duration(5000 * time.Millisecond),
+	HostName:             "http://localhost:8080",
+	PathWhitelist:        []string{},
+	MinSubpaths:          1,
+	MaxSubpaths:          5,
+	QueriesPerAggression: 50,
 })
 
 // GetConfig Gets the config

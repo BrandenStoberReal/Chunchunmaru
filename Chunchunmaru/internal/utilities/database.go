@@ -226,3 +226,30 @@ func UpsertRow(db *sql.DB, table SqlTable, values []interface{}) error {
 	_, err := db.Exec(query, values...)
 	return err
 }
+
+// More GPT function
+// SumQueries returns the sum of the 'queries' column for all rows in the table.
+func SumQueries(db *sql.DB, table *SqlTable) (int, error) {
+	// Validate that the table has a 'queries' column
+	hasQueries := false
+	for _, col := range table.Columns {
+		if col == "queries" {
+			hasQueries = true
+			break
+		}
+	}
+	if !hasQueries {
+		return 0, fmt.Errorf("table %s does not have a 'queries' column", table.Name)
+	}
+
+	query := fmt.Sprintf("SELECT SUM(queries) FROM %s", table.Name)
+	var sum sql.NullInt64
+	err := db.QueryRow(query).Scan(&sum)
+	if err != nil {
+		return 0, err
+	}
+	if !sum.Valid {
+		return 0, nil // No rows in table, so sum is 0
+	}
+	return int(sum.Int64), nil
+}

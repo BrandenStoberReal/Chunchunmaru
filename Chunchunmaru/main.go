@@ -11,7 +11,6 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"runtime"
@@ -49,8 +48,8 @@ func main() {
 		database = db
 	}
 
-	ipColumns := []string{"ip TEXT PRIMARY KEY", "queries INTEGER"}
-	uaColumns := []string{"useragent TEXT PRIMARY KEY", "queries INTEGER"}
+	ipColumns := []string{"ip TEXT PRIMARY KEY", "queries INTEGER", "aggression INTEGER"}
+	uaColumns := []string{"useragent TEXT PRIMARY KEY", "queries INTEGER", "aggression INTEGER"}
 	utilities.CreateTable(database, utilities.SqlTable{
 		Name:    "ipinfo",
 		Columns: ipColumns,
@@ -136,7 +135,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 		case "/api/logging/queries/ip":
 			table := utilities.SqlTable{
 				Name:    "ipinfo",
-				Columns: []string{"ip", "queries"},
+				Columns: []string{"ip", "queries", "aggression"},
 			}
 
 			ipQueries, iperr := utilities.FetchAllIpInfo(database, &table)
@@ -163,7 +162,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 		case "/api/logging/queries/useragent":
 			table := utilities.SqlTable{
 				Name:    "agentinfo",
-				Columns: []string{"useragent", "queries"},
+				Columns: []string{"useragent", "queries", "aggression"},
 			}
 
 			uaQueries, iperr := utilities.FetchAllUserAgentInfo(database, &table)
@@ -174,6 +173,46 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 
 			replybytes, marshalerr := json.Marshal(uaQueries)
+			if marshalerr != nil {
+				log.Println("Error marshalling json ", marshalerr)
+				handleWebError(writer, marshalerr)
+				return
+			}
+
+			_, writeerr := writer.Write(replybytes)
+			if writeerr != nil {
+				log.Println("Error writing json ", writeerr)
+				handleWebError(writer, writeerr)
+				return
+			}
+			break
+		case "/api/logging/queries/info":
+
+			ipTable := utilities.SqlTable{
+				Name:    "ipinfo",
+				Columns: []string{"ip", "queries", "aggression"},
+			}
+			uaTable := utilities.SqlTable{
+				Name:    "agentinfo",
+				Columns: []string{"useragent", "queries", "aggression"},
+			}
+			totalIpQueries, iperr := utilities.SumQueries(database, &ipTable)
+			if iperr != nil {
+				log.Println("Error summarizing ip info ", iperr)
+				handleWebError(writer, iperr)
+				return
+			}
+
+			totalUaQueries, uaerr := utilities.SumQueries(database, &uaTable)
+			if uaerr != nil {
+				log.Println("Error summarizing ua info ", uaerr)
+				handleWebError(writer, uaerr)
+				return
+			}
+
+			replybytes, marshalerr := json.Marshal(utilities.ApiQueryInfoReply{
+				TotalQueries: totalIpQueries + totalUaQueries,
+			})
 			if marshalerr != nil {
 				log.Println("Error marshalling json ", marshalerr)
 				handleWebError(writer, marshalerr)
@@ -264,68 +303,101 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// IP Logging
-	{
-		clientip := strings.Split(r.RemoteAddr, ":")[0]
-		ipTable := utilities.SqlTable{
-			Name:    "ipinfo",
-			Columns: []string{"ip", "queries"},
-		}
-		queries, err := utilities.FetchSingleValue[int](database, &ipTable, "queries", "ip", clientip)
-		if err == sql.ErrNoRows {
-			queries = 0
-			log.Printf("No record found for IP %s, defaulting queries to %d\n", clientip, queries)
-		} else if err != nil {
-			log.Println("Database error:", err)
-		} else {
-			log.Printf("Queries for IP %s: %d\n", clientip, queries)
-		}
-
-		values := []interface{}{clientip, queries + 1}
-		err = utilities.UpsertRow(database, ipTable, values)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	// User Agent Logging
-	{
-		userAgent := r.Header.Get("User-Agent")
-		uaTable := utilities.SqlTable{
-			Name:    "agentinfo",
-			Columns: []string{"useragent", "queries"},
-		}
-		queries, err := utilities.FetchSingleValue[int](database, &uaTable, "queries", "useragent", userAgent)
-
-		if err == sql.ErrNoRows {
-			queries = 0
-			log.Printf("No record found for User-Agent %s, defaulting queries to %d\n", userAgent, queries)
-		} else if err != nil {
-			log.Println("Database error:", err)
-		} else {
-			log.Printf("Queries for User-Agent %s: %d\n", userAgent, queries)
-		}
-
-		values := []interface{}{userAgent, queries + 1}
-		err = utilities.UpsertRow(database, uaTable, values)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-
+	// Variables
+	clientip := strings.Split(r.RemoteAddr, ":")[0]
+	userAgent := r.Header.Get("User-Agent")
 	config := utilities.AppConfig.GetConfig()
+	html, filename, _ := utilities.RandomHTMLFromDir("./templates")
+
+	// Tables
+	ipTable := utilities.SqlTable{
+		Name:    "ipinfo",
+		Columns: []string{"ip", "queries", "aggression"},
+	}
+	uaTable := utilities.SqlTable{
+		Name:    "agentinfo",
+		Columns: []string{"useragent", "queries", "aggression"},
+	}
+
+	// SQL code
+	ipQueries, iperr := utilities.FetchSingleValue[int](database, &ipTable, "queries", "ip", clientip)
+	if iperr == sql.ErrNoRows {
+		ipQueries = 0
+		log.Printf("No record found for IP %s, defaulting queries to %d\n", clientip, ipQueries)
+	} else if iperr != nil {
+		log.Println("Database error:", iperr)
+	} else {
+		log.Printf("Queries for IP %s: %d\n", clientip, ipQueries)
+	}
+
+	ipAggression, ipagerr := utilities.FetchSingleValue[int](database, &ipTable, "aggression", "ip", clientip)
+	if ipagerr == sql.ErrNoRows {
+		ipAggression = 0
+		log.Printf("No record found for IP %s, defaulting aggression to %d\n", clientip, ipAggression)
+	} else if ipagerr != nil {
+		log.Println("Database error:", ipagerr)
+	} else {
+		log.Printf("Aggression for IP %s: %d\n", clientip, ipAggression)
+	}
+
+	uaQueries, uaerr := utilities.FetchSingleValue[int](database, &uaTable, "queries", "useragent", userAgent)
+	if uaerr == sql.ErrNoRows {
+		uaQueries = 0
+		log.Printf("No record found for User-Agent %s, defaulting queries to %d\n", userAgent, uaQueries)
+	} else if uaerr != nil {
+		log.Println("Database error:", uaerr)
+	} else {
+		log.Printf("Queries for User-Agent %s: %d\n", userAgent, uaQueries)
+	}
+
+	uaAggression, uaagerr := utilities.FetchSingleValue[int](database, &uaTable, "aggression", "useragent", userAgent)
+	if uaagerr == sql.ErrNoRows {
+		uaAggression = 0
+		log.Printf("No record found for IP %s, defaulting aggression to %d\n", userAgent, uaAggression)
+	} else if uaagerr != nil {
+		log.Println("Database error:", uaagerr)
+	} else {
+		log.Printf("Aggression for IP %s: %d\n", userAgent, uaAggression)
+	}
+
+	ipValues := []interface{}{clientip, ipQueries + 1, (ipQueries + 1) / config.QueriesPerAggression}
+	ipuperr := utilities.UpsertRow(database, ipTable, ipValues)
+	if ipuperr != nil {
+		log.Println(ipuperr)
+		return
+	}
+
+	uaValues := []interface{}{userAgent, uaQueries + 1, (uaQueries + 1) / config.QueriesPerAggression}
+	uauperr := utilities.UpsertRow(database, uaTable, uaValues)
+	if uauperr != nil {
+		log.Println(uauperr)
+		return
+	}
+
+	// Aggression code
+	var templateAggression int
+	if (uaQueries+1)/config.QueriesPerAggression > (ipQueries+1)/config.QueriesPerAggression {
+		// UA has higher aggression level
+		templateAggression = (uaQueries + 1) / config.QueriesPerAggression
+	} else if (uaQueries+1)/config.QueriesPerAggression < (ipQueries+1)/config.QueriesPerAggression {
+		// IP has higher aggression level
+		templateAggression = (ipQueries + 1) / config.QueriesPerAggression
+	} else if (uaQueries+1)/config.QueriesPerAggression == (ipQueries+1)/config.QueriesPerAggression {
+		// Both have same aggression, default to IP
+		templateAggression = (ipQueries + 1) / config.QueriesPerAggression
+	}
+
+	// Website delay
 	log.Printf("Waiting with delay %fs\n", time.Duration(config.Delay).Seconds())
 	time.Sleep(time.Duration(config.Delay))
-	html, filename, _ := utilities.RandomHTMLFromDir("./templates")
-	aggression := rand.Intn(101)
-	log.Printf("Serving template: %s with aggression %d\n", filename, aggression)
+
+	log.Printf("Serving template: %s with aggression %d\n", filename, templateAggression)
 	template, err := macros.BuildTemplate(filename, html)
 	if err != nil {
 		log.Printf("Error building template: %s", err)
 		return
 	}
-	err = template.Execute(w, macros.TemplateInput{Aggression: aggression})
+	err = template.Execute(w, macros.TemplateInput{Aggression: templateAggression})
 	if err != nil {
 		if strings.Contains(err.Error(), "An established connection was aborted by the software in your host machine.") {
 			log.Println("Error executing template: Client browser aborted the request.")
