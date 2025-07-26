@@ -49,6 +49,18 @@ func main() {
 		database = db
 	}
 
+	ipColumns := []string{"ip TEXT PRIMARY KEY", "queries INTEGER"}
+	uaColumns := []string{"useragent TEXT PRIMARY KEY", "queries INTEGER"}
+	utilities.CreateTable(database, utilities.SqlTable{
+		Name:    "ipinfo",
+		Columns: ipColumns,
+	})
+
+	utilities.CreateTable(database, utilities.SqlTable{
+		Name:    "agentinfo",
+		Columns: uaColumns,
+	})
+
 	// Entrypoint
 	log.Println("Welcome to Chunchunmaru!")
 	log.Printf("Found %d words in words.txt\n", utilities.WordCount())
@@ -114,6 +126,60 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 				handleWebError(writer, marshalerr)
 				return
 			}
+			_, writeerr := writer.Write(replybytes)
+			if writeerr != nil {
+				log.Println("Error writing json ", writeerr)
+				handleWebError(writer, writeerr)
+				return
+			}
+			break
+		case "/api/logging/queries/ip":
+			table := utilities.SqlTable{
+				Name:    "ipinfo",
+				Columns: []string{"ip", "queries"},
+			}
+
+			ipQueries, iperr := utilities.FetchAllIpInfo(database, &table)
+			if iperr != nil {
+				log.Println("Error fetching ip info ", iperr)
+				handleWebError(writer, iperr)
+				return
+			}
+
+			replybytes, marshalerr := json.Marshal(ipQueries)
+			if marshalerr != nil {
+				log.Println("Error marshalling json ", marshalerr)
+				handleWebError(writer, marshalerr)
+				return
+			}
+
+			_, writeerr := writer.Write(replybytes)
+			if writeerr != nil {
+				log.Println("Error writing json ", writeerr)
+				handleWebError(writer, writeerr)
+				return
+			}
+			break
+		case "/api/logging/queries/useragent":
+			table := utilities.SqlTable{
+				Name:    "agentinfo",
+				Columns: []string{"useragent", "queries"},
+			}
+
+			uaQueries, iperr := utilities.FetchAllUserAgentInfo(database, &table)
+			if iperr != nil {
+				log.Println("Error fetching agent info ", iperr)
+				handleWebError(writer, iperr)
+				return
+			}
+
+			replybytes, marshalerr := json.Marshal(uaQueries)
+			if marshalerr != nil {
+				log.Println("Error marshalling json ", marshalerr)
+				handleWebError(writer, marshalerr)
+				return
+			}
+
 			_, writeerr := writer.Write(replybytes)
 			if writeerr != nil {
 				log.Println("Error writing json ", writeerr)
@@ -197,6 +263,57 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/api") || strings.HasPrefix(r.URL.Path, "/config") {
 		return
 	}
+
+	// IP Logging
+	{
+		clientip := strings.Split(r.RemoteAddr, ":")[0]
+		ipTable := utilities.SqlTable{
+			Name:    "ipinfo",
+			Columns: []string{"ip", "queries"},
+		}
+		queries, err := utilities.FetchSingleValue[int](database, &ipTable, "queries", "ip", clientip)
+		if err == sql.ErrNoRows {
+			queries = 0
+			log.Printf("No record found for IP %s, defaulting queries to %d\n", clientip, queries)
+		} else if err != nil {
+			log.Println("Database error:", err)
+		} else {
+			log.Printf("Queries for IP %s: %d\n", clientip, queries)
+		}
+
+		values := []interface{}{clientip, queries + 1}
+		err = utilities.UpsertRow(database, ipTable, values)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+	// User Agent Logging
+	{
+		userAgent := r.Header.Get("User-Agent")
+		uaTable := utilities.SqlTable{
+			Name:    "agentinfo",
+			Columns: []string{"useragent", "queries"},
+		}
+		queries, err := utilities.FetchSingleValue[int](database, &uaTable, "queries", "useragent", userAgent)
+
+		if err == sql.ErrNoRows {
+			queries = 0
+			log.Printf("No record found for User-Agent %s, defaulting queries to %d\n", userAgent, queries)
+		} else if err != nil {
+			log.Println("Database error:", err)
+		} else {
+			log.Printf("Queries for User-Agent %s: %d\n", userAgent, queries)
+		}
+
+		values := []interface{}{userAgent, queries + 1}
+		err = utilities.UpsertRow(database, uaTable, values)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+
 	config := utilities.AppConfig.GetConfig()
 	log.Printf("Waiting with delay %fs\n", time.Duration(config.Delay).Seconds())
 	time.Sleep(time.Duration(config.Delay))

@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"strings"
@@ -25,7 +26,7 @@ func CloseDatabase(db *sql.DB) {
 	db.Close()
 }
 
-func CreateTable(db *sql.DB, table *SqlTable) (sql.Result, error) {
+func CreateTable(db *sql.DB, table SqlTable) (sql.Result, error) {
 	result, err := db.Exec("CREATE TABLE IF NOT EXISTS `" + table.Name + "` (" + strings.Join(table.Columns, ", ") + ")")
 	if err != nil {
 		log.Fatal(err)
@@ -61,22 +62,167 @@ func DeleteFromTable(db *sql.DB, table *SqlTable) (sql.Result, error) {
 	return result, nil
 }
 
-func FetchValuesFromColumn(db *sql.DB, table *SqlTable, column string) ([]string, error) {
-	rows, err := db.Query("select " + column + " from " + table.Name)
+// Credit to GPT for this function since I hate SQL. I wrote the rest with help from docs.
+// FetchSingleValue fetches a single value from a given column for a row identified by the keyColumn/keyValue.
+func FetchSingleValue[T any](db *sql.DB, table *SqlTable, column, keyColumn string, keyValue interface{}) (T, error) {
+	// Validate column and keyColumn names
+	validCol, validKey := false, false
+	for _, col := range table.Columns {
+		if col == column {
+			validCol = true
+		}
+		if col == keyColumn {
+			validKey = true
+		}
+	}
+	if !validCol {
+		var zero T
+		return zero, fmt.Errorf("invalid column name: %s", column)
+	}
+	if !validKey {
+		var zero T
+		return zero, fmt.Errorf("invalid key column name: %s", keyColumn)
+	}
+
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s = ?", column, table.Name, keyColumn)
+	var value T
+	err := db.QueryRow(query, keyValue).Scan(&value)
+	return value, err
+}
+
+// Also written by GPT, although it really didn't need to be honestly.
+// ResetColumnForKey sets a specific column (e.g., "queries") to a value (e.g., 0)
+// for the row(s) where keyColumn = keyValue.
+func ResetColumnForKey(db *sql.DB, table *SqlTable, targetColumn string, resetValue interface{}, keyColumn string, keyValue interface{}) error {
+	// Validate columns exist
+	validTarget, validKey := false, false
+	for _, col := range table.Columns {
+		if col == targetColumn {
+			validTarget = true
+		}
+		if col == keyColumn {
+			validKey = true
+		}
+	}
+	if !validTarget {
+		return fmt.Errorf("table %s does not have a '%s' column", table.Name, targetColumn)
+	}
+	if !validKey {
+		return fmt.Errorf("table %s does not have a '%s' column", table.Name, keyColumn)
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s = ? WHERE %s = ?", table.Name, targetColumn, keyColumn)
+	_, err := db.Exec(query, resetValue, keyValue)
+	return err
+}
+
+// Also GPT due to me not understanding SQL or GO well enough to marshal data types between both, although I now understand how the code works.
+// FetchAllIpInfo returns a slice of IpInfoStruct, one for each row in the table.
+func FetchAllIpInfo(db *sql.DB, table *SqlTable) ([]IpInfoStruct, error) {
+	// Validate columns exist
+	hasIp, hasQueries := false, false
+	for _, col := range table.Columns {
+		if col == "ip" {
+			hasIp = true
+		}
+		if col == "queries" {
+			hasQueries = true
+		}
+	}
+	if !hasIp || !hasQueries {
+		return nil, fmt.Errorf("table %s must have 'ip' and 'queries' columns", table.Name)
+	}
+
+	query := fmt.Sprintf("SELECT ip, queries FROM %s", table.Name)
+	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer rows.Close()
-	var values []string
+
+	var results []IpInfoStruct
 	for rows.Next() {
-		var value string
-		scanerr := rows.Scan(&value)
-		if scanerr != nil {
-			log.Fatal(err)
-			return nil, scanerr
+		var info IpInfoStruct
+		// Marshal the data types
+		if err := rows.Scan(&info.Ip, &info.Queries); err != nil {
+			return nil, err
 		}
-		values = append(values, value)
+		results = append(results, info)
 	}
-	return values, nil
+	return results, rows.Err()
+}
+
+// FetchAllUserAgentInfo Same as its sister function, except for user-agenting.
+func FetchAllUserAgentInfo(db *sql.DB, table *SqlTable) ([]UserAgentInfoStruct, error) {
+	// Validate columns exist
+	hasUa, hasQueries := false, false
+	for _, col := range table.Columns {
+		if col == "useragent" {
+			hasUa = true
+		}
+		if col == "queries" {
+			hasQueries = true
+		}
+	}
+	if !hasUa || !hasQueries {
+		return nil, fmt.Errorf("table %s must have 'useragent' and 'queries' columns", table.Name)
+	}
+
+	query := fmt.Sprintf("SELECT useragent, queries FROM %s", table.Name)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []UserAgentInfoStruct
+	for rows.Next() {
+		var info UserAgentInfoStruct
+		// Marshal the data types
+		if err := rows.Scan(&info.UserAgent, &info.Queries); err != nil {
+			return nil, err
+		}
+		results = append(results, info)
+	}
+	return results, rows.Err()
+}
+
+// WipeAllRows deletes all rows from the table but keeps the table structure.
+func WipeAllRows(db *sql.DB, table *SqlTable) error {
+	query := fmt.Sprintf("DELETE FROM %s", table.Name)
+	_, err := db.Exec(query)
+	return err
+}
+
+// Another GPT function
+// UpsertRow performs an upsert (insert or update) for any table described by SqlTable.
+// Assumes the first column is the unique key.
+func UpsertRow(db *sql.DB, table SqlTable, values []interface{}) error {
+	if len(table.Columns) == 0 || len(values) != len(table.Columns) {
+		return fmt.Errorf("column and value count mismatch")
+	}
+
+	// Build column and placeholder lists
+	columns := strings.Join(table.Columns, ", ")
+	placeholders := strings.Repeat("?, ", len(table.Columns))
+	placeholders = strings.TrimSuffix(placeholders, ", ")
+
+	// Build ON CONFLICT clause for the first column (assumed unique)
+	updateSet := []string{}
+	for i, col := range table.Columns {
+		// Don't update the unique key column
+		if i == 0 {
+			continue
+		}
+		updateSet = append(updateSet, fmt.Sprintf("%s = excluded.%s", col, col))
+	}
+	updateClause := strings.Join(updateSet, ", ")
+
+	query := fmt.Sprintf(
+		"INSERT INTO %s (%s) VALUES (%s) ON CONFLICT(%s) DO UPDATE SET %s;",
+		table.Name, columns, placeholders, table.Columns[0], updateClause,
+	)
+
+	_, err := db.Exec(query, values...)
+	return err
 }

@@ -15,6 +15,16 @@ type ApiTemplateInfoReply struct {
 	TotalDiskUsage int64    `json:"totalDiskUsage"`
 }
 
+type IpInfoStruct struct {
+	Ip      string `json:"ip"`
+	Queries int    `json:"queries"`
+}
+
+type UserAgentInfoStruct struct {
+	UserAgent string `json:"userAgent"`
+	Queries   int    `json:"queries"`
+}
+
 // ApiUploadTemplateData INPUT: Defines data the client needs to send to the server to create a new template.
 type ApiUploadTemplateData struct {
 	FileName      string `json:"fileName"`
