@@ -78,7 +78,7 @@ Example usage in a template:
 ```
 ---
 ## API Schema
-The API exposes endpoints for server info and template management. See [internal/utilities/api.go](file:///Chunchunmaru/internal/utilities/api.go) for struct definitions.
+The API exposes endpoints for server info and template management. See [internal/utilities/api.go](file://Chunchunmaru/internal/utilities/api.go) for struct definitions.
 
 ## Credits
 **CTAG07** - Minor Math Contributions + Template Engine + Initial Concept
