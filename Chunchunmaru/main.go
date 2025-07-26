@@ -289,6 +289,9 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 				return
 			}
 			break
+		case "/api/markov/train":
+			// TODO: Implement markov funcs here.
+			break
 		}
 		break
 	default:
