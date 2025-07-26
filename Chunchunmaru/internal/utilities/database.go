@@ -22,7 +22,7 @@ func OpenDatabase(filepath string) (*sql.DB, error) {
 }
 
 func CloseDatabase(db *sql.DB) {
-	defer db.Close()
+	db.Close()
 }
 
 func CreateTable(db *sql.DB, table *SqlTable) (sql.Result, error) {
