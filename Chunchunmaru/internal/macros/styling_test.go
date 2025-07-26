@@ -26,7 +26,7 @@ func BenchmarkRandomClasses(b *testing.B) {
 	var result interface{}
 
 	for i := 0; i < b.N; i++ {
-		result = randomClasses("test", 5)
+		result = randomClasses(5)
 	}
 
 	printTestResults(b.Name(), result)
