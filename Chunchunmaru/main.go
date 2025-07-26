@@ -383,7 +383,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		// IP has higher aggression level
 		templateAggression = (ipQueries + 1) / config.QueriesPerAggression
 	} else if (uaQueries+1)/config.QueriesPerAggression == (ipQueries+1)/config.QueriesPerAggression {
-		// Both have same aggression, default to IP
+		// Both have the same aggression, default to IP
 		templateAggression = (ipQueries + 1) / config.QueriesPerAggression
 	}
 
