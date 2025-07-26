@@ -3,6 +3,7 @@ package main
 import (
 	"chunchunmaru/internal/macros"
 	"chunchunmaru/internal/utilities"
+	"database/sql"
 	_ "embed"
 	"encoding/base64"
 	"encoding/json"
@@ -19,6 +20,7 @@ import (
 )
 
 var startTime time.Time
+var database *sql.DB
 
 func uptime() time.Duration {
 	return time.Since(startTime)
@@ -37,6 +39,16 @@ func handleWebErrorWithMessage(w http.ResponseWriter, err string) {
 }
 
 func main() {
+	// DB
+	db, err := utilities.OpenDatabase("./chunchunmaru.db")
+
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("Connected to local database.")
+		database = db
+	}
+
 	// Entrypoint
 	log.Println("Welcome to Chunchunmaru!")
 	log.Printf("Found %d words in words.txt\n", utilities.WordCount())
