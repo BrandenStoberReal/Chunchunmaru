@@ -388,8 +388,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Website delay
-	log.Printf("Waiting with delay %fs\n", time.Duration(config.Delay).Seconds())
-	time.Sleep(time.Duration(config.Delay))
+	randomDelay := utilities.RandomDuration(time.Duration(config.MinDelay), time.Duration(config.MaxDelay))
+	log.Printf("Waiting with delay %fs\n", randomDelay.Seconds())
+	time.Sleep(randomDelay)
 
 	log.Printf("Serving template: %s with aggression %d\n", filename, templateAggression)
 	template, err := macros.BuildTemplate(filename, html)

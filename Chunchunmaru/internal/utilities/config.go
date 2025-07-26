@@ -41,7 +41,8 @@ func (d *Duration) MarshalJSON() ([]byte, error) {
 
 type Config struct {
 	Port                 int      `json:"port"`
-	Delay                Duration `json:"delay"`
+	MinDelay             Duration `json:"minDelay"`
+	MaxDelay             Duration `json:"maxDelay"`
 	HostName             string   `json:"hostname"`
 	PathWhitelist        []string `json:"path_whitelist"`
 	MinSubpaths          int      `json:"min_subpaths"`
@@ -63,7 +64,8 @@ func NewConfigManager(initialConfig Config) *ConfigManager {
 
 var AppConfig = NewConfigManager(Config{
 	Port:                 8080,
-	Delay:                Duration(5000 * time.Millisecond),
+	MinDelay:             Duration(1000 * time.Millisecond),
+	MaxDelay:             Duration(5000 * time.Millisecond),
 	HostName:             "http://localhost:8080",
 	PathWhitelist:        []string{},
 	MinSubpaths:          1,
@@ -110,7 +112,7 @@ func (cm *ConfigManager) ConfigSetAPI(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Port must be between 0 and 65535.", http.StatusBadRequest)
 		return
 	}
-	if newConfig.Delay < 0 {
+	if newConfig.MinDelay < 0 {
 		http.Error(w, "Delay must be greater or equal to 0.", http.StatusBadRequest)
 		return
 	}
