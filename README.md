@@ -87,6 +87,6 @@ This creates a feedback loop: the more that a scraper requests, the more hostile
 ### Credits
 CTAG07 - Minor Math Contributions + Template Engine + Initial Concept
 
-Credit to @CTAG07 and @SpoonBee for also wanting to sue me for forking this repo, even though the license was MIT! 
+Further credit to @SpoonBee for wanting to sue me for forking this repo, even though the license was MIT!
 
 ![Lolsuit](https://files.catbox.moe/mtjdsd.jpg)
