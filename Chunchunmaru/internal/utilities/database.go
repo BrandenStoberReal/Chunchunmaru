@@ -10,7 +10,6 @@ import (
 type SqlTable struct {
 	Name    string
 	Columns []string
-	Values  []interface{}
 }
 
 func OpenDatabase(filepath string) (*sql.DB, error) {
