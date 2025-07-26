@@ -90,9 +90,11 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			for _, file := range files {
 				filenames = append(filenames, file.Name())
 			}
+			templatesDirSize, _ := utilities.DirSize("templates")
 			reply := utilities.ApiTemplateInfoReply{
-				Count:     len(files),
-				FileNames: filenames,
+				Count:          len(files),
+				FileNames:      filenames,
+				TotalDiskUsage: templatesDirSize,
 			}
 			replybytes, marshalerr := json.Marshal(reply)
 			if marshalerr != nil {
