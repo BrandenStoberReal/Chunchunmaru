@@ -210,7 +210,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = template.Execute(w, macros.TemplateInput{Aggression: aggression})
 	if err != nil {
-		log.Printf("Error executing template: %s", err)
+		if strings.Contains(err.Error(), "An established connection was aborted by the software in your host machine.") {
+			log.Println("Error executing template: Client browser aborted the request.")
+		} else {
+			log.Printf("Error executing template: %s", err)
+		}
 	}
 
 	//if r.URL.Path != "/" {
