@@ -1,5 +1,3 @@
-Certainly! Here is a direct replacement for your [README.md](file:///C:/Users/Branden/GolandProjects/Chunchunmaru/README.md) that accurately reflects your current codebase, macro/template system, and API/configuration schema:
----
 # Chunchunmaru
 *A sophisticated, Go-based web scraper tarpit.*
 Chunchunmaru is a defensive tool designed to protect websites from unauthorized scraping. It dynamically generates a web of convincing, believable, and resource-intensive pages that are delivered with adaptive throttling. The primary goal is to waste a scraper's resources (CPU, time, network), pollute its dataset with plausible-sounding junk, and ultimately make scraping a given site prohibitively expensive—all without being easily detected as an artificial trap.
