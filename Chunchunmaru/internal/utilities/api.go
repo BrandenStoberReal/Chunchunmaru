@@ -1,11 +1,13 @@
 package utilities
 
-type ApiBaseReply struct {
+type ApiBaseInfoReply struct {
 	AppVersion string  `json:"appVersion"`
 	Uptime     float64 `json:"uptime"`
+	Os         string  `json:"os"`
+	Arch       string  `json:"arch"`
 }
 
-type ApiTemplateReply struct {
+type ApiTemplateInfoReply struct {
 	Count     int      `json:"count"`
 	FileNames []string `json:"fileNames"`
 }

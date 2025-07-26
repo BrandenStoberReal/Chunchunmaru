@@ -7,10 +7,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -56,9 +59,11 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 		switch request.URL.Path {
 		case "/api/server/info":
 			// Provides generic server info to the client
-			reply := utilities.ApiBaseReply{
+			reply := utilities.ApiBaseInfoReply{
 				AppVersion: "1.0.0",
 				Uptime:     uptime().Seconds(),
+				Os:         cases.Title(language.English, cases.Compact).String(runtime.GOOS),
+				Arch:       cases.Title(language.English, cases.Compact).String(runtime.GOARCH),
 			}
 			replybytes, marshalerr := json.Marshal(reply)
 			if marshalerr != nil {
@@ -85,7 +90,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			for _, file := range files {
 				filenames = append(filenames, file.Name())
 			}
-			reply := utilities.ApiTemplateReply{
+			reply := utilities.ApiTemplateInfoReply{
 				Count:     len(files),
 				FileNames: filenames,
 			}
