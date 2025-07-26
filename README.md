@@ -1,7 +1,6 @@
-Certainly! Here is a direct replacement for your [README.md](file:///C:/Users/Branden/GolandProjects/Chunchunmaru/README.md) that accurately reflects your current codebase, macro/template system, and API/configuration schema:
----
 # Chunchunmaru
 *A sophisticated, Go-based web scraper tarpit.*
+
 Chunchunmaru is a defensive tool designed to protect websites from unauthorized scraping. It dynamically generates a web of convincing, believable, and resource-intensive pages that are delivered with adaptive throttling. The primary goal is to waste a scraper's resources (CPU, time, network), pollute its dataset with plausible-sounding junk, and ultimately make scraping a given site prohibitively expensive—all without being easily detected as an artificial trap.
 ![Crashed Tab Image](https://files.catbox.moe/gimu54.png)
 ## Core Principles
@@ -80,11 +79,7 @@ Example usage in a template:
 ```
 ---
 ## API Schema
-The API exposes endpoints for server info and template management. See [internal/utilities/api.go](file:///C:/Users/Branden/GolandProjects/Chunchunmaru/Chunchunmaru/internal/utilities/api.go) for struct definitions:
-- `ApiBaseInfoReply`: `{AppVersion, Uptime, Os, Arch}`
-- `ApiTemplateInfoReply`: `{FileNames, Count, TotalDiskUsage}`
-- `ApiUploadTemplateData`: `{FileName, ContentBase64}`
-- `ApiDeleteTemplateData`: `{FileName}`
+The API exposes endpoints for server info and template management. See [internal/utilities/api.go](file://Chunchunmaru/internal/utilities/api.go) for struct definitions.
 
 ## Credits
 **CTAG07** - Minor Math Contributions + Template Engine + Initial Concept
