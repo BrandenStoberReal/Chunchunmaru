@@ -16,7 +16,7 @@ func printTestResults(name, result interface{}) {
 	fmt.Printf("--------------------------\n")
 }
 
-func TestChainGenerate(t *testing.T) {
+func BenchmarkChainGenerate(b *testing.B) {
 	chain := TrainMarkovModel(dataset, 5, 2.0, nil)
 	order := chain.Order
 	tokens := make([]string, 0)

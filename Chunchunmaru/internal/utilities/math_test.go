@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestRandomNumber(t *testing.T) {
+func BenchmarkRandomNumber(b *testing.B) {
 	printTestResults("Random Number", RandomNumber(0, 100))
 }
