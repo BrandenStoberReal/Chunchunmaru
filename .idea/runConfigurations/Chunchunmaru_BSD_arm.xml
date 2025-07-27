@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Chunchunmaru FreeBSD arm" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="Build Specific OS's">
+  <configuration default="false" name="Chunchunmaru BSD arm" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="FreeBSD">
     <module name="Chunchunmaru" />
     <working_directory value="$PROJECT_DIR$" />
     <envs>
