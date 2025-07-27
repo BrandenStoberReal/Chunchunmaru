@@ -321,7 +321,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 			break
 		default:
-			handleWebErrorWithMessage(writer, "Unsupported API method. Did you mean to send a GET request instead?")
+			handleWebErrorWithMessage(writer, "Unknown or unsupported API endpoint. Did you mean to send a GET request instead?")
 			break
 		}
 		break
