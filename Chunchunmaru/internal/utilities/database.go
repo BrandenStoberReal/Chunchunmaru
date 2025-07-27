@@ -120,7 +120,7 @@ func ResetColumnForKey(db *sql.DB, table *SqlTable, targetColumn string, resetVa
 // FetchAllIpInfo returns a slice of IpInfoStruct, one for each row in the table.
 func FetchAllIpInfo(db *sql.DB, table *SqlTable) ([]IpInfoStruct, error) {
 	// Validate columns exist
-	hasIp, hasQueries := false, false
+	hasIp, hasQueries, hasAggression := false, false, false
 	for _, col := range table.Columns {
 		if col == "ip" {
 			hasIp = true
@@ -128,12 +128,15 @@ func FetchAllIpInfo(db *sql.DB, table *SqlTable) ([]IpInfoStruct, error) {
 		if col == "queries" {
 			hasQueries = true
 		}
+		if col == "aggression" {
+			hasAggression = true
+		}
 	}
-	if !hasIp || !hasQueries {
-		return nil, fmt.Errorf("table %s must have 'ip' and 'queries' columns", table.Name)
+	if !hasIp || !hasQueries || !hasAggression {
+		return nil, fmt.Errorf("table %s must have 'ip', 'queries' and 'aggression' columns", table.Name)
 	}
 
-	query := fmt.Sprintf("SELECT ip, queries FROM %s", table.Name)
+	query := fmt.Sprintf("SELECT ip, queries, aggression FROM %s", table.Name)
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -155,7 +158,7 @@ func FetchAllIpInfo(db *sql.DB, table *SqlTable) ([]IpInfoStruct, error) {
 // FetchAllUserAgentInfo Same as its sister function, except for user-agenting.
 func FetchAllUserAgentInfo(db *sql.DB, table *SqlTable) ([]UserAgentInfoStruct, error) {
 	// Validate columns exist
-	hasUa, hasQueries := false, false
+	hasUa, hasQueries, hasAggression := false, false, false
 	for _, col := range table.Columns {
 		if col == "useragent" {
 			hasUa = true
@@ -163,12 +166,15 @@ func FetchAllUserAgentInfo(db *sql.DB, table *SqlTable) ([]UserAgentInfoStruct, 
 		if col == "queries" {
 			hasQueries = true
 		}
+		if col == "aggression" {
+			hasAggression = true
+		}
 	}
-	if !hasUa || !hasQueries {
-		return nil, fmt.Errorf("table %s must have 'useragent' and 'queries' columns", table.Name)
+	if !hasUa || !hasQueries || !hasAggression {
+		return nil, fmt.Errorf("table %s must have 'useragent', 'queries', and 'aggression' columns", table.Name)
 	}
 
-	query := fmt.Sprintf("SELECT useragent, queries FROM %s", table.Name)
+	query := fmt.Sprintf("SELECT useragent, queries, aggression FROM %s", table.Name)
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
