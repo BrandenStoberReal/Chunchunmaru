@@ -28,8 +28,8 @@ func TrainMarkovModel(data string, maxOrder int, minSamplesPerState float64, exi
 	return chain
 }
 
-func SaveMarkovModel(chain *gomarkov.Chain) {
-	jsonObj, _ := json.Marshal(chain)
+func SaveMarkovModel() {
+	jsonObj, _ := json.Marshal(MarkovModel)
 	err := os.WriteFile("model.json", jsonObj, 0644)
 	if err != nil {
 		fmt.Println(err)

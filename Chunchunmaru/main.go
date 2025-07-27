@@ -312,7 +312,7 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			if data.Corpus != "" {
 				chain := utilities.TrainMarkovModel(data.Corpus, 5, 2.0, utilities.MarkovModel)
 				utilities.MarkovModel = chain
-				utilities.SaveMarkovModel(utilities.MarkovModel)
+				utilities.SaveMarkovModel()
 				writer.Header().Add("Content-Type", "text/html")
 				writer.Write([]byte("OK"))
 			} else {
