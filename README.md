@@ -16,7 +16,7 @@ Macros are available in Go templates and grouped by category. All macros are reg
 ## Category 1: Content Generation
 | Macro Signature                                                                        | Description |
 |:---------------------------------------------------------------------------------------| :--- |
-| `markovSentence "model" length`                                                        | Generates a thematic sentence from a Markov chain model with `length` tokens. |
+| `markovSentence length`                                                        | Generates a thematic sentence from a Markov chain model with `length` tokens. |
 | `markovParagraphs count minSentences maxSentences minSentenceLength maxSentenceLength` | Generates `count` paragraphs using the Markov model. |
 | `randomParagraphs count minSentences maxSentences minSentenceLength maxSentenceLength` | Generates `count` paragraphs of filler text using random words. |
 | `randomSentence length`                                                                | Generates a nonsensical sentence from `length` random words. |
