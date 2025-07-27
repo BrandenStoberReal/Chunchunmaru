@@ -17,7 +17,7 @@ func printTestResults(name, result interface{}) {
 }
 
 func TestChainGenerate(t *testing.T) {
-	chain := TrainMarkovModel(dataset, 5, 2.0)
+	chain := TrainMarkovModel(dataset, 5, 2.0, nil)
 	order := chain.Order
 	tokens := make([]string, 0)
 	for i := 0; i < order; i++ {

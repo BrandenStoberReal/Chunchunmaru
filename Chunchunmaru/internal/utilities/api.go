@@ -39,3 +39,7 @@ type ApiUploadTemplateData struct {
 type ApiDeleteTemplateData struct {
 	FileName string `json:"fileName"`
 }
+
+type ApiMarkovTrainData struct {
+	Corpus string `json:"corpus"`
+}

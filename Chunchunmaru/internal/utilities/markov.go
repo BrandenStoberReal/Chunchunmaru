@@ -9,8 +9,13 @@ import (
 	"strings"
 )
 
-func TrainMarkovModel(data string, maxOrder int, minSamplesPerState float64) *gomarkov.Chain {
-	chain := gomarkov.NewChain(autoOrder(data, maxOrder, minSamplesPerState))
+func TrainMarkovModel(data string, maxOrder int, minSamplesPerState float64, existingChain *gomarkov.Chain) *gomarkov.Chain {
+	var chain *gomarkov.Chain
+	if existingChain != nil {
+		chain = existingChain
+	} else {
+		chain = gomarkov.NewChain(autoOrder(data, maxOrder, minSamplesPerState))
+	}
 	for _, sentence := range strings.Split(data, ".") {
 		sentence = strings.TrimSpace(sentence)
 		if sentence == "" {
@@ -29,13 +34,9 @@ func SaveMarkovModel(chain *gomarkov.Chain) {
 	}
 }
 
-func LoadMarkovModel(filepath string) (*gomarkov.Chain, error) {
-	if filepath == "" {
-		filepath = "model.json"
-	}
-
+func LoadMarkovModel() (*gomarkov.Chain, error) {
 	var chain gomarkov.Chain
-	data, err := os.ReadFile(filepath)
+	data, err := os.ReadFile("model.json")
 	if err != nil {
 		return &chain, err
 	}

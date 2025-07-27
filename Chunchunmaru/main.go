@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/mb-14/gomarkov"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"log"
@@ -20,6 +21,7 @@ import (
 
 var startTime time.Time
 var database *sql.DB
+var markovModel *gomarkov.Chain
 
 func uptime() time.Duration {
 	return time.Since(startTime)
@@ -59,6 +61,17 @@ func main() {
 		Name:    "agentinfo",
 		Columns: uaColumns,
 	})
+
+	// Markov
+	if utilities.FileExists("model.json") {
+		model, markerr := utilities.LoadMarkovModel()
+		if markerr != nil {
+			log.Fatal(markerr)
+			return
+		}
+
+		markovModel = model
+	}
 
 	// Entrypoint
 	log.Println("Welcome to Chunchunmaru!")
@@ -290,7 +303,24 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 			break
 		case "/api/markov/train":
-			// TODO: Implement markov funcs here.
+			decoder := json.NewDecoder(request.Body)
+			var data utilities.ApiMarkovTrainData
+			decoderr := decoder.Decode(&data)
+			if decoderr != nil {
+				log.Println("Error decoding json ", decoderr)
+				handleWebError(writer, decoderr)
+				return
+			}
+			if data.Corpus != "" {
+				chain := utilities.TrainMarkovModel(data.Corpus, 5, 2.0, markovModel)
+				markovModel = chain
+				utilities.SaveMarkovModel(markovModel)
+				writer.Header().Add("Content-Type", "text/html")
+				writer.Write([]byte("OK"))
+			} else {
+				handleWebErrorWithMessage(writer, "Corpus must not be empty.")
+				return
+			}
 			break
 		}
 		break
@@ -333,16 +363,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Queries for IP %s: %d\n", clientip, ipQueries)
 	}
 
-	ipAggression, ipagerr := utilities.FetchSingleValue[int](database, &ipTable, "aggression", "ip", clientip)
-	if ipagerr == sql.ErrNoRows {
-		ipAggression = 0
-		log.Printf("No record found for IP %s, defaulting aggression to %d\n", clientip, ipAggression)
-	} else if ipagerr != nil {
-		log.Println("Database error:", ipagerr)
-	} else {
-		log.Printf("Aggression for IP %s: %d\n", clientip, ipAggression)
-	}
-
 	uaQueries, uaerr := utilities.FetchSingleValue[int](database, &uaTable, "queries", "useragent", userAgent)
 	if uaerr == sql.ErrNoRows {
 		uaQueries = 0
@@ -351,16 +371,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Database error:", uaerr)
 	} else {
 		log.Printf("Queries for User-Agent %s: %d\n", userAgent, uaQueries)
-	}
-
-	uaAggression, uaagerr := utilities.FetchSingleValue[int](database, &uaTable, "aggression", "useragent", userAgent)
-	if uaagerr == sql.ErrNoRows {
-		uaAggression = 0
-		log.Printf("No record found for IP %s, defaulting aggression to %d\n", userAgent, uaAggression)
-	} else if uaagerr != nil {
-		log.Println("Database error:", uaagerr)
-	} else {
-		log.Printf("Aggression for IP %s: %d\n", userAgent, uaAggression)
 	}
 
 	ipValues := []interface{}{clientip, ipQueries + 1, (ipQueries + 1) / config.QueriesPerAggression}

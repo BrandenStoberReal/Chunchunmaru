@@ -32,7 +32,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{{markovSentence "model.json" (add 8 (div $aggression 6))}} - {{randomWord}}</title>
+    <title>{{markovSentence (add 8 (div $aggression 6))}} - {{randomWord}}</title>
     <meta charset="UTF-8">
     {{ randomCSSVars $cssVars }}
     {{- range $i := repeat $styleBlockCount }}
@@ -53,7 +53,7 @@
 <body class="{{randomClasses (add 5 (div $aggression 8))}}" {{randomInlineStyle (add 8 (div $aggression 7))}}>
 {{nestDivs $mainDivs}}
 <header>
-    <h1>{{markovSentence "model.json" (add 12 (div $aggression 7))}}</h1>
+    <h1>{{markovSentence (add 12 (div $aggression 7))}}</h1>
     <nav>
         {{range $i := repeat $navLinks}}
         <a href="{{randomQueryLink (add 3 (div $aggression 16))}}" class="nav {{randomClasses 2}}" style="{{randomCSSStyle (add 2 (div $aggression 8))}}">{{randomWord}}</a>
@@ -68,7 +68,7 @@
 <main>
     <section class="doc">
         <h2>Introduction</h2>
-        <p>{{markovParagraphs "model.json" (add 2 (div $aggression 10)) 3 10 22 38}}</p>
+        <p>{{markovParagraphs (add 2 (div $aggression 10)) 3 10 22 38}}</p>
         {{jsInteractiveContent "div" (randomSentence (add 12 (div $aggression 8)))}}
     </section>
     <section class="doc">
@@ -125,7 +125,7 @@
         </div>
         <div>
             <h3>Hydrated Example</h3>
-            {{jsInteractiveContent "div" (markovParagraphs "model.json" (add 2 (div $aggression 8)) 3 14 28 48)}}
+            {{jsInteractiveContent "div" (markovParagraphs (add 2 (div $aggression 8)) 3 14 28 48)}}
         </div>
     </section>
     <aside class="aside">
@@ -159,7 +159,7 @@
         <h2>Tier 4: The Hammer</h2>
         {{- range repeat $jsContentCount }}
         <div class="component-loader {{ randomClasses 2 }}">
-            <h4>{{ markovSentence "model.json" (randomInt 3 5) }}</h4>
+            <h4>{{ markovSentence (randomInt 3 5) }}</h4>
             {{- $contentType := randomChoice (list "json" "text" "auth") -}}
             {{- $hiddenContent := "" -}}
             {{- if eq $contentType "json" -}}
@@ -167,7 +167,7 @@
             {{- else if eq $contentType "auth" -}}
             {{- $hiddenContent = printf "Token: %s" (randomString "hex" 64) -}}
             {{- else -}}
-            {{- $hiddenContent = markovParagraphs "model.json" 1 2 3 15 30 -}}
+            {{- $hiddenContent = markovParagraphs 1 2 3 15 30 -}}
             {{- end -}}
             {{- jsInteractiveContent "div" $hiddenContent -}}
         </div>

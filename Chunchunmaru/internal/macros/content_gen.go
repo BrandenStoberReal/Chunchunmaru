@@ -9,8 +9,8 @@ import (
 	"unicode"
 )
 
-func markovSentence(modelpath string, length int) string {
-	model, err := utilities.LoadMarkovModel(modelpath)
+func markovSentence(length int) string {
+	model, err := utilities.LoadMarkovModel()
 	if err != nil {
 		return ""
 	}
@@ -26,12 +26,12 @@ func markovSentence(modelpath string, length int) string {
 	return strings.Join(tokens[order:len(tokens)-1], " ") + "."
 }
 
-func markovParagraphs(modelpath string, count, minSentences, maxSentences, minSentenceLength, maxSentenceLength int) string {
+func markovParagraphs(count, minSentences, maxSentences, minSentenceLength, maxSentenceLength int) string {
 	output := ""
 
 	for i := 0; i < count; i++ {
 		for j := 0; j < randomInt(minSentences, maxSentences); j++ {
-			output = output + markovSentence(modelpath, randomInt(minSentenceLength, maxSentenceLength)) + " "
+			output = output + markovSentence(randomInt(minSentenceLength, maxSentenceLength)) + " "
 		}
 		output = output + "\n"
 	}
