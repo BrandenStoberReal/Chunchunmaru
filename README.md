@@ -14,15 +14,15 @@ Chunchunmaru employs a dynamic aggression model that escalates its response base
 # Macro Library
 Macros are available in Go templates and grouped by category. All macros are registered in the template engine and can be used directly in HTML templates.
 ## Category 1: Content Generation
-| Macro Signature | Description |
-| :--- | :--- |
-| `markovSentence "model" length` | Generates a thematic sentence from a Markov chain model with `length` tokens. |
-| `markovParagraphs "model" count minSentences maxSentences minSentenceLength maxSentenceLength` | Generates `count` paragraphs using the Markov model. |
+| Macro Signature                                                                        | Description |
+|:---------------------------------------------------------------------------------------| :--- |
+| `markovSentence "model" length`                                                        | Generates a thematic sentence from a Markov chain model with `length` tokens. |
+| `markovParagraphs count minSentences maxSentences minSentenceLength maxSentenceLength` | Generates `count` paragraphs using the Markov model. |
 | `randomParagraphs count minSentences maxSentences minSentenceLength maxSentenceLength` | Generates `count` paragraphs of filler text using random words. |
-| `randomSentence length` | Generates a nonsensical sentence from `length` random words. |
-| `randomWord` | Returns a single random word. |
-| `randomString "type" length` | Generates a random string. Types: `username`, `email`, `uuid`, `hex`, `alphanum`. |
-| `randomDate "layout" "start" "end"` | Generates a random, formatted date within a range. |
+| `randomSentence length`                                                                | Generates a nonsensical sentence from `length` random words. |
+| `randomWord`                                                                           | Returns a single random word. |
+| `randomString "type" length`                                                           | Generates a random string. Types: `username`, `email`, `uuid`, `hex`, `alphanum`. |
+| `randomDate "layout" "start" "end"`                                                    | Generates a random, formatted date within a range. |
 ## Category 2: Structure & Composition
 | Macro Signature | Description |
 | :--- | :--- |
