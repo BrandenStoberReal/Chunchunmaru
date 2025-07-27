@@ -20,13 +20,15 @@ type ApiQueryInfoReply struct {
 }
 
 type IpInfoStruct struct {
-	Ip      string `json:"ip"`
-	Queries int    `json:"queries"`
+	Ip         string `json:"ip"`
+	Queries    int    `json:"queries"`
+	Aggression int    `json:"aggression"`
 }
 
 type UserAgentInfoStruct struct {
-	UserAgent string `json:"userAgent"`
-	Queries   int    `json:"queries"`
+	UserAgent  string `json:"userAgent"`
+	Queries    int    `json:"queries"`
+	Aggression int    `json:"aggression"`
 }
 
 // ApiUploadTemplateData INPUT: Defines data the client needs to send to the server to create a new template.

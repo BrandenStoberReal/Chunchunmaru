@@ -144,7 +144,7 @@ func FetchAllIpInfo(db *sql.DB, table *SqlTable) ([]IpInfoStruct, error) {
 	for rows.Next() {
 		var info IpInfoStruct
 		// Marshal the data types
-		if err := rows.Scan(&info.Ip, &info.Queries); err != nil {
+		if err := rows.Scan(&info.Ip, &info.Queries, &info.Aggression); err != nil {
 			return nil, err
 		}
 		results = append(results, info)
@@ -179,7 +179,7 @@ func FetchAllUserAgentInfo(db *sql.DB, table *SqlTable) ([]UserAgentInfoStruct, 
 	for rows.Next() {
 		var info UserAgentInfoStruct
 		// Marshal the data types
-		if err := rows.Scan(&info.UserAgent, &info.Queries); err != nil {
+		if err := rows.Scan(&info.UserAgent, &info.Queries, &info.Aggression); err != nil {
 			return nil, err
 		}
 		results = append(results, info)
