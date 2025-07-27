@@ -196,7 +196,6 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 			break
 		case "/api/logging/queries/info":
-
 			ipTable := utilities.SqlTable{
 				Name:    "ipinfo",
 				Columns: []string{"ip", "queries", "aggression"},
@@ -234,6 +233,9 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 				handleWebError(writer, writeerr)
 				return
 			}
+			break
+		default:
+			handleWebErrorWithMessage(writer, "Unknown or unsupported API endpoint. Did you mean to send a POST request instead?")
 			break
 		}
 		break
@@ -317,6 +319,9 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 				handleWebErrorWithMessage(writer, "Corpus must not be empty.")
 				return
 			}
+			break
+		default:
+			handleWebErrorWithMessage(writer, "Unsupported API method. Did you mean to send a GET request instead?")
 			break
 		}
 		break
