@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var MarkovModel *gomarkov.Chain
+
 func TrainMarkovModel(data string, maxOrder int, minSamplesPerState float64, existingChain *gomarkov.Chain) *gomarkov.Chain {
 	var chain *gomarkov.Chain
 	if existingChain != nil {
@@ -44,6 +46,7 @@ func LoadMarkovModel() (*gomarkov.Chain, error) {
 	if err != nil {
 		return &chain, err
 	}
+	MarkovModel = &chain
 	return &chain, nil
 }
 

@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/mb-14/gomarkov"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"log"
@@ -21,7 +20,6 @@ import (
 
 var startTime time.Time
 var database *sql.DB
-var markovModel *gomarkov.Chain
 
 func uptime() time.Duration {
 	return time.Since(startTime)
@@ -64,13 +62,11 @@ func main() {
 
 	// Markov
 	if utilities.FileExists("model.json") {
-		model, markerr := utilities.LoadMarkovModel()
+		_, markerr := utilities.LoadMarkovModel()
 		if markerr != nil {
 			log.Fatal(markerr)
 			return
 		}
-
-		markovModel = model
 	}
 
 	// Entrypoint
@@ -312,9 +308,9 @@ func apiHandler(writer http.ResponseWriter, request *http.Request) {
 				return
 			}
 			if data.Corpus != "" {
-				chain := utilities.TrainMarkovModel(data.Corpus, 5, 2.0, markovModel)
-				markovModel = chain
-				utilities.SaveMarkovModel(markovModel)
+				chain := utilities.TrainMarkovModel(data.Corpus, 5, 2.0, utilities.MarkovModel)
+				utilities.MarkovModel = chain
+				utilities.SaveMarkovModel(utilities.MarkovModel)
 				writer.Header().Add("Content-Type", "text/html")
 				writer.Write([]byte("OK"))
 			} else {

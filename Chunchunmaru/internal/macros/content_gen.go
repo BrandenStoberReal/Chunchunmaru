@@ -10,17 +10,16 @@ import (
 )
 
 func markovSentence(length int) string {
-	model, err := utilities.LoadMarkovModel()
-	if err != nil {
+	if utilities.MarkovModel == nil {
 		return ""
 	}
-	order := model.Order
+	order := utilities.MarkovModel.Order
 	tokens := make([]string, 0)
 	for i := 0; i < order; i++ {
 		tokens = append(tokens, gomarkov.StartToken)
 	}
 	for tokens[len(tokens)-1] != gomarkov.EndToken && len(tokens) < length {
-		next, _ := model.Generate(tokens[(len(tokens) - order):])
+		next, _ := utilities.MarkovModel.Generate(tokens[(len(tokens) - order):])
 		tokens = append(tokens, next)
 	}
 	return strings.Join(tokens[order:len(tokens)-1], " ") + "."
