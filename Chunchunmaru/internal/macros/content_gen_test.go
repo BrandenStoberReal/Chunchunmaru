@@ -15,7 +15,7 @@ func printTestResults(name, result interface{}) {
 func BenchmarkMarkovSentence(b *testing.B) {
 	var result interface{}
 	for i := 0; i < b.N; i++ {
-		result = markovSentence("testModel", 24)
+		result = markovSentence(24)
 	}
 	printTestResults(b.Name(), result)
 }
@@ -23,7 +23,7 @@ func BenchmarkMarkovSentence(b *testing.B) {
 func BenchmarkMarkovParagraphs(b *testing.B) {
 	var result interface{}
 	for i := 0; i < b.N; i++ {
-		result = markovParagraphs("testModel", 10, 5, 20, 25, 50)
+		result = markovParagraphs(10, 5, 20, 25, 50)
 	}
 	printTestResults(b.Name(), result)
 }
