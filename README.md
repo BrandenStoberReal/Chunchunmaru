@@ -83,7 +83,3 @@ The API exposes endpoints for server info and template management. See [internal
 
 ## Credits
 **CTAG07** - Minor Math Contributions + Template Engine + Initial Concept
-
-Further credit to **@SpoonBee** on GitHub for wanting to sue me for forking this repo, even though the license was MIT!
-
-![Lolsuit](https://files.catbox.moe/mtjdsd.jpg)
